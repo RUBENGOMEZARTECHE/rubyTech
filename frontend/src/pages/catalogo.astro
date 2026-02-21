@@ -1,0 +1,101 @@
+---
+import MainLayout from '../layouts/MainLayout.astro';
+import { getProducts, getCategories } from '../lib/api.js';
+
+const products = await getProducts();
+const categories = await getCategories();
+---
+
+<MainLayout title="Catálogo">
+  <section class="section" style="padding-top:100px">
+    <div class="section-header">
+      <h2>Nuestro <span class="gradient">Catálogo</span></h2>
+      <p>Explora todos nuestros productos de tecnología premium</p>
+    </div>
+
+    <div class="catalog-controls">
+      <div class="filter-btns">
+        <button class="filter-btn active" data-cat="all">Todos</button>
+        {categories.map((cat: any) => (
+          <button class="filter-btn" data-cat={cat.slug}>
+            <i class={`fa-solid ${cat.slug === 'moviles' ? 'fa-mobile-screen' : cat.slug === 'portatiles' ? 'fa-laptop' : 'fa-desktop'}`}></i>
+            {cat.name}
+          </button>
+        ))}
+      </div>
+      <div class="search-box">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input type="text" id="searchInput" placeholder="Buscar producto..." />
+      </div>
+    </div>
+
+    <div class="products-grid" id="catalogProducts">
+      {products.map((p: any) => (
+        <a href={`/productos/${p.slug}`} class="product-card" data-cat={p.category?.slug}>
+          <div class="product-img" style="background:var(--bg3)">
+            {p.badge && (
+              <span class={`product-badge ${p.badge}`}>
+                {p.badge === 'new' ? 'Nuevo' : p.badge === 'sale' ? 'Oferta' : 'Popular'}
+              </span>
+            )}
+            <i class={`fa-solid ${p.category?.slug === 'moviles' ? 'fa-mobile-screen-button' : p.category?.slug === 'portatiles' ? 'fa-laptop' : 'fa-desktop'}`}></i>
+            <span class="quick-view"><i class="fa-solid fa-eye"></i> Ver detalles</span>
+          </div>
+          <div class="product-info">
+            <div class="product-brand">{p.brand}</div>
+            <h3 class="product-name">{p.name}</h3>
+            <div class="product-price">
+              <span class="price-current">{p.price.toLocaleString('es-ES')}€</span>
+              {p.previousPrice && <span class="price-old">{p.previousPrice.toLocaleString('es-ES')}€</span>}
+            </div>
+          </div>
+        </a>
+      ))}
+    </div>
+    <div class="products-count" id="productsCount"></div>
+  </section>
+</MainLayout>
+
+<script>
+  const cards = document.querySelectorAll('.product-card') as NodeListOf<HTMLElement>;
+  const countEl = document.getElementById('productsCount');
+
+  function updateCount() {
+    const visible = [...cards].filter(c => c.style.display !== 'none').length;
+    if (countEl) countEl.textContent = `Mostrando ${visible} de ${cards.length} productos`;
+  }
+
+  // Filtro por categoría
+  document.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const cat = btn.getAttribute('data-cat');
+      cards.forEach(card => {
+        card.style.display = (cat === 'all' || card.getAttribute('data-cat') === cat) ? '' : 'none';
+      });
+      updateCount();
+    });
+  });
+
+  // Búsqueda
+  document.getElementById('searchInput')?.addEventListener('input', (e) => {
+    const val = (e.target as HTMLInputElement).value.toLowerCase();
+    cards.forEach(card => {
+      const name = card.querySelector('.product-name')?.textContent?.toLowerCase() || '';
+      const brand = card.querySelector('.product-brand')?.textContent?.toLowerCase() || '';
+      card.style.display = (name.includes(val) || brand.includes(val)) ? '' : 'none';
+    });
+    updateCount();
+  });
+
+  // Activar filtro desde URL
+  const params = new URLSearchParams(window.location.search);
+  const catParam = params.get('cat');
+  if (catParam) {
+    const btn = document.querySelector(`[data-cat="${catParam}"]`) as HTMLElement;
+    if (btn) btn.click();
+  }
+
+  updateCount();
+</script>

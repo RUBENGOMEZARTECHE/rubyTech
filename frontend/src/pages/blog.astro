@@ -1,0 +1,43 @@
+---
+import MainLayout from '../layouts/MainLayout.astro';
+import { getBlogPosts } from '../lib/api.js';
+
+const posts = await getBlogPosts();
+---
+
+<MainLayout title="Blog">
+  <section class="section" style="padding-top:100px">
+    <div class="section-header">
+      <h2>Blog <span class="gradient">RubyTech</span></h2>
+      <p>Noticias, guías y análisis del mundo tecnológico</p>
+    </div>
+
+    <div class="blog-grid">
+      {posts.length === 0 ? (
+        <div class="no-results">
+          <i class="fa-solid fa-newspaper"></i>
+          <p>No hay artículos publicados todavía</p>
+        </div>
+      ) : (
+        posts.map((post: any) => (
+          <a href={`/blog/${post.slug}`} class="blog-card">
+            <div class="blog-img" style="background:linear-gradient(135deg,var(--bg3),var(--bg4))">
+              <span class="blog-cat">{post.category}</span>
+              <i class="fa-solid fa-newspaper"></i>
+            </div>
+            <div class="blog-content">
+              <div class="blog-meta">
+                <span><i class="fa-regular fa-calendar"></i> {post.publishedDate}</span>
+                <span><i class="fa-regular fa-user"></i> {post.author}</span>
+                <span><i class="fa-regular fa-clock"></i> {post.readingTime} min</span>
+              </div>
+              <h3>{post.title}</h3>
+              <p>{post.excerpt}</p>
+              <span class="blog-read">Leer más <i class="fa-solid fa-arrow-right"></i></span>
+            </div>
+          </a>
+        ))
+      )}
+    </div>
+  </section>
+</MainLayout>

@@ -1,0 +1,99 @@
+---
+import MainLayout from '../layouts/MainLayout.astro';
+---
+
+<MainLayout title="Contacto">
+  <section class="section" style="padding-top:100px">
+    <div class="section-header">
+      <h2>Contacta con <span class="gradient">nosotros</span></h2>
+      <p>Estamos aquí para ayudarte. No dudes en escribirnos.</p>
+    </div>
+
+    <div class="contact-grid">
+      <div>
+        <div class="contact-info-cards">
+          <div class="contact-card">
+            <div class="contact-card-icon c1"><i class="fa-solid fa-location-dot"></i></div>
+            <div><h4>Dirección</h4><p>Calle Gran Vía 42, 28013 Madrid, España</p></div>
+          </div>
+          <div class="contact-card">
+            <div class="contact-card-icon c2"><i class="fa-solid fa-phone"></i></div>
+            <div><h4>Teléfono</h4><p>+34 912 345 678</p></div>
+          </div>
+          <div class="contact-card">
+            <div class="contact-card-icon c3"><i class="fa-solid fa-envelope"></i></div>
+            <div><h4>Email</h4><p>info@rubytech.es</p></div>
+          </div>
+          <div class="contact-card">
+            <div class="contact-card-icon c4"><i class="fa-solid fa-clock"></i></div>
+            <div><h4>Horario</h4><p>Lun - Vie: 9:00 - 20:00 | Sáb: 10:00 - 14:00</p></div>
+          </div>
+        </div>
+        <div style="margin-top:2rem;background:var(--bg2);border-radius:var(--radius);overflow:hidden;height:250px;border:1px solid rgba(255,255,255,.05)">
+          <iframe
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3037.2!2d-3.7037!3d40.4198!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zNDDCsDI1JzExLjMiTiAzwrA0MicxMy4zIlc!5e0!3m2!1ses!2ses!4v1"
+            width="100%"
+            height="250"
+            style="border:0;filter:invert(90%) hue-rotate(180deg);"
+            allowfullscreen
+            loading="lazy"
+          ></iframe>
+        </div>
+      </div>
+
+      <div class="contact-form" id="contactForm">
+        <h3>Envíanos un mensaje</h3>
+        <p style="color:var(--text2);font-size:.9rem;margin-bottom:2rem">Responderemos en menos de 24 horas</p>
+
+        <form id="theForm">
+          <div class="form-row">
+            <div class="form-group">
+              <label>Nombre *</label>
+              <input type="text" placeholder="Tu nombre" required />
+            </div>
+            <div class="form-group">
+              <label>Email *</label>
+              <input type="email" placeholder="tu@email.com" required />
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Asunto</label>
+            <select>
+              <option>Consulta general</option>
+              <option>Soporte técnico</option>
+              <option>Pedidos y envíos</option>
+              <option>Devoluciones</option>
+              <option>Colaboración</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Mensaje *</label>
+            <textarea placeholder="Escribe tu mensaje aquí..." required></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center">
+            <i class="fa-solid fa-paper-plane"></i> Enviar mensaje
+          </button>
+        </form>
+
+        <div id="formSuccess" style="display:none;text-align:center;padding:2rem;color:var(--green);font-weight:600">
+          <i class="fa-solid fa-circle-check" style="font-size:3rem;margin-bottom:1rem;display:block"></i>
+          <p>¡Mensaje enviado correctamente!<br>Te responderemos lo antes posible.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+</MainLayout>
+
+<script>
+  document.getElementById('theForm')?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const form = document.getElementById('theForm') as HTMLElement;
+    form.style.display = 'none';
+    document.getElementById('formSuccess')!.style.display = 'block';
+    setTimeout(() => {
+      form.style.display = 'block';
+      (form as HTMLFormElement).reset();
+      document.getElementById('formSuccess')!.style.display = 'none';
+    }, 4000);
+  });
+</script>

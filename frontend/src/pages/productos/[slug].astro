@@ -1,0 +1,103 @@
+---
+import MainLayout from '../../layouts/MainLayout.astro';
+import { getProducts, getProductBySlug } from '../../lib/api.js';
+
+export async function getStaticPaths() {
+  const products = await getProducts();
+  return products.map((p: any) => ({
+    params: { slug: p.slug },
+  }));
+}
+
+const { slug } = Astro.params;
+const p = await getProductBySlug(slug!);
+
+if (!p) return Astro.redirect('/catalogo');
+
+const discount = p.previousPrice
+  ? Math.round((1 - p.price / p.previousPrice) * 100)
+  : 0;
+
+const catSlug = p.category?.slug;
+const icon = catSlug === 'moviles' ? 'fa-mobile-screen-button' : catSlug === 'portatiles' ? 'fa-laptop' : 'fa-desktop';
+---
+
+<MainLayout title={p.name}>
+  <section class="section" style="padding-top:100px">
+
+    <a href="/catalogo" class="detail-back">
+      <i class="fa-solid fa-arrow-left"></i> Volver al catálogo
+    </a>
+
+    <div class="detail-container">
+
+      <!-- IMAGEN -->
+      <div class="detail-image" style="background:var(--bg3)">
+        {p.badge && (
+          <span class={`detail-badge product-badge ${p.badge}`}>
+            {p.badge === 'new' ? 'Nuevo' : p.badge === 'sale' ? 'Oferta' : 'Popular'}
+          </span>
+        )}
+        <i class={`fa-solid ${icon}`}></i>
+      </div>
+
+      <!-- INFO -->
+      <div class="detail-info">
+        <div class="detail-brand">{p.brand} — {p.category?.name}</div>
+        <h1>{p.name}</h1>
+
+        <div class="detail-price-box">
+          <span class="detail-price">{p.price.toLocaleString('es-ES')}€</span>
+          {p.previousPrice && (
+            <>
+              <span class="detail-old-price">{p.previousPrice.toLocaleString('es-ES')}€</span>
+              <span class="detail-discount">-{discount}%</span>
+            </>
+          )}
+        </div>
+
+        {p.description && (
+          <p class="detail-desc">
+            {p.description[0]?.children[0]?.text}
+          </p>
+        )}
+
+        <!-- SPECS -->
+        {p.specs && (
+          <div class="detail-specs">
+            <h3><i class="fa-solid fa-microchip"></i> Especificaciones técnicas</h3>
+            <div class="specs-grid">
+              {p.specs.processor && <div class="spec-item"><span class="spec-label">Procesador</span><span class="spec-value">{p.specs.processor}</span></div>}
+              {p.specs.ram && <div class="spec-item"><span class="spec-label">RAM</span><span class="spec-value">{p.specs.ram}</span></div>}
+              {p.specs.storage && <div class="spec-item"><span class="spec-label">Almacenamiento</span><span class="spec-value">{p.specs.storage}</span></div>}
+              {p.specs.screen && <div class="spec-item"><span class="spec-label">Pantalla</span><span class="spec-value">{p.specs.screen}</span></div>}
+              {p.specs.battery && <div class="spec-item"><span class="spec-label">Batería</span><span class="spec-value">{p.specs.battery}</span></div>}
+            </div>
+          </div>
+        )}
+
+        <div class="detail-actions">
+          <button class="btn-cart" id="btnCart">
+            <i class="fa-solid fa-cart-plus"></i> Añadir al carrito
+          </button>
+          <button class="btn-wish">
+            <i class="fa-regular fa-heart"></i>
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </section>
+</MainLayout>
+
+<script>
+  const btn = document.getElementById('btnCart');
+  btn?.addEventListener('click', () => {
+    btn.innerHTML = '<i class="fa-solid fa-check"></i> ¡Añadido!';
+    btn.style.background = 'linear-gradient(135deg, #00b894, #55efc4)';
+    setTimeout(() => {
+      btn.innerHTML = '<i class="fa-solid fa-cart-plus"></i> Añadir al carrito';
+      btn.style.background = '';
+    }, 1500);
+  });
+</script>
