@@ -7,7 +7,7 @@ export async function getCategories() {
 }
 
 export async function getProducts() {
-  const res = await fetch(`${STRAPI_URL}/api/products?populate=*`);
+  const res = await fetch(`${STRAPI_URL}/api/products?populate=*&pagination[limit]=100`);
   const data = await res.json();
   return data.data;
 }
