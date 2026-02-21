@@ -1,17 +1,125 @@
 ---
+import MainLayout from '../layouts/MainLayout.astro';
+import { getProducts, getCategories } from '../lib/api.js';
 
+const categories = await getCategories();
+const products = await getProducts();
+const featured = products.filter((p: any) => p.badge === 'hot' || p.rating >= 4.8).slice(0, 6);
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
-</html>
+<MainLayout title="Inicio">
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="float-shape s1"></div>
+    <div class="float-shape s2"></div>
+    <div class="float-shape s3"></div>
+    <div class="hero-content">
+      <div class="hero-badge"><i class="fa-solid fa-sparkles"></i> Nuevos lanzamientos 2024</div>
+      <h1>La tecnología del <span class="gradient">futuro</span>, hoy en tus manos</h1>
+      <p>Descubre nuestra selección premium de móviles, portátiles y ordenadores de sobremesa con las mejores ofertas del mercado.</p>
+      <div class="hero-btns">
+        <a href="/catalogo" class="btn btn-primary"><i class="fa-solid fa-bag-shopping"></i> Ver Catálogo</a>
+        <a href="/contacto" class="btn btn-outline"><i class="fa-solid fa-headset"></i> Contactar</a>
+      </div>
+      <div class="hero-stats">
+        <div class="stat"><div class="stat-num">10K+</div><div class="stat-label">Clientes felices</div></div>
+        <div class="stat"><div class="stat-num">500+</div><div class="stat-label">Productos</div></div>
+        <div class="stat"><div class="stat-num">99%</div><div class="stat-label">Satisfacción</div></div>
+        <div class="stat"><div class="stat-num">24/7</div><div class="stat-label">Soporte técnico</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES + CATEGORÍAS + DESTACADOS -->
+  <section class="section">
+
+    <!-- FEATURES -->
+    <div class="section-header fade-up">
+      <h2>¿Por qué elegir <span class="gradient">RubyTech</span>?</h2>
+      <p>Ofrecemos la mejor experiencia de compra en tecnología</p>
+    </div>
+    <div class="features fade-up">
+      <div class="feature-card">
+        <div class="feature-icon f1"><i class="fa-solid fa-truck-fast"></i></div>
+        <h3>Envío Gratuito</h3>
+        <p>En pedidos superiores a 49€. Entrega en 24-48h en toda la península.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon f2"><i class="fa-solid fa-shield-check"></i></div>
+        <h3>Garantía 3 Años</h3>
+        <p>Todos nuestros productos incluyen garantía extendida de 3 años.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon f3"><i class="fa-solid fa-rotate-left"></i></div>
+        <h3>Devolución Fácil</h3>
+        <p>30 días para devolver tu producto sin preguntas ni complicaciones.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon f4"><i class="fa-solid fa-headset"></i></div>
+        <h3>Soporte 24/7</h3>
+        <p>Nuestro equipo de expertos está disponible las 24 horas del día.</p>
+      </div>
+    </div>
+
+    <!-- CATEGORÍAS -->
+    <div class="section-header fade-up">
+      <h2>Explora nuestras <span class="gradient">categorías</span></h2>
+      <p>Encuentra exactamente lo que necesitas en nuestra amplia selección</p>
+    </div>
+    <div class="category-grid fade-up">
+      {categories.map((cat: any) => (
+        <a href={`/catalogo?cat=${cat.slug}`} class="category-card">
+          <div class={`cat-bg ${cat.slug}`}>
+            <i class={`fa-solid ${cat.slug === 'moviles' ? 'fa-mobile-screen-button' : cat.slug === 'portatiles' ? 'fa-laptop' : 'fa-desktop'}`}></i>
+          </div>
+          <div class="cat-overlay">
+            <div class="cat-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+            <h3>{cat.name}</h3>
+            <p>{cat.description}</p>
+          </div>
+        </a>
+      ))}
+    </div>
+
+    <!-- PRODUCTOS DESTACADOS -->
+    <div class="section-header fade-up">
+      <h2>Productos <span class="gradient">destacados</span></h2>
+      <p>Lo más vendido y mejor valorado por nuestros clientes</p>
+    </div>
+    <div class="products-grid fade-up">
+      {products.slice(0, 6).map((p: any) => (
+        <a href={`/productos/${p.slug}`} class="product-card">
+          <div class="product-img" style={`background:var(--bg3)`}>
+            {p.badge && (
+              <span class={`product-badge ${p.badge}`}>
+                {p.badge === 'new' ? 'Nuevo' : p.badge === 'sale' ? 'Oferta' : 'Popular'}
+              </span>
+            )}
+            <i class={`fa-solid ${p.category?.slug === 'moviles' ? 'fa-mobile-screen-button' : p.category?.slug === 'portatiles' ? 'fa-laptop' : 'fa-desktop'}`}></i>
+            <span class="quick-view"><i class="fa-solid fa-eye"></i> Ver detalles</span>
+          </div>
+          <div class="product-info">
+            <div class="product-brand">{p.brand}</div>
+            <h3 class="product-name">{p.name}</h3>
+            <div class="product-price">
+              <span class="price-current">{p.price.toLocaleString('es-ES')}€</span>
+              {p.previousPrice && <span class="price-old">{p.previousPrice.toLocaleString('es-ES')}€</span>}
+            </div>
+          </div>
+        </a>
+      ))}
+    </div>
+
+  </section>
+
+</MainLayout>
+
+<script>
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) entry.target.classList.add('visible');
+    });
+  }, { threshold: 0.1 });
+  document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+</script>

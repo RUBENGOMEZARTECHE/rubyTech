@@ -1,0 +1,108 @@
+---
+export interface Props {
+  title?: string;
+}
+const { title = 'RubyTech' } = Astro.props;
+---
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{title} — RubyTech</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link rel="stylesheet" href="/src/styles/global.css" />
+</head>
+<body>
+
+<!-- NAVIGATION -->
+<nav class="nav" id="navbar">
+  <a href="/" class="nav-logo">
+    <i class="fa-solid fa-gem"></i>
+    <span>RubyTech</span>
+  </a>
+  <div class="nav-links" id="navLinks">
+    <a href="/" class="nav-link"><i class="fa-solid fa-house"></i> Inicio</a>
+    <a href="/catalogo" class="nav-link"><i class="fa-solid fa-grid-2"></i> Catálogo</a>
+    <a href="/blog" class="nav-link"><i class="fa-solid fa-newspaper"></i> Blog</a>
+    <a href="/contacto" class="nav-link"><i class="fa-solid fa-envelope"></i> Contacto</a>
+  </div>
+  <div style="display:flex;align-items:center;gap:.6rem">
+    <button class="nav-cart">
+      <i class="fa-solid fa-cart-shopping"></i>
+      <span class="badge">0</span>
+    </button>
+    <button class="menu-toggle" id="menuToggle">
+      <i class="fa-solid fa-bars"></i>
+    </button>
+  </div>
+</nav>
+
+<!-- CONTENIDO DE LA PÁGINA -->
+<slot />
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <h3><i class="fa-solid fa-gem"></i> <span>RubyTech</span></h3>
+      <p>Tu tienda de confianza en electrónica premium. Los mejores productos al mejor precio con garantía y envío rápido.</p>
+      <div class="footer-socials">
+        <a href="#"><i class="fa-brands fa-facebook-f"></i></a>
+        <a href="#"><i class="fa-brands fa-twitter"></i></a>
+        <a href="#"><i class="fa-brands fa-instagram"></i></a>
+        <a href="#"><i class="fa-brands fa-youtube"></i></a>
+        <a href="#"><i class="fa-brands fa-tiktok"></i></a>
+      </div>
+    </div>
+    <div class="footer-col">
+      <h4>Categorías</h4>
+      <a href="/catalogo?cat=moviles">Móviles</a>
+      <a href="/catalogo?cat=portatiles">Portátiles</a>
+      <a href="/catalogo?cat=ordenadores-de-sobremesa">Sobremesa</a>
+    </div>
+    <div class="footer-col">
+      <h4>Empresa</h4>
+      <a href="#">Sobre nosotros</a>
+      <a href="/blog">Blog</a>
+      <a href="/contacto">Contacto</a>
+    </div>
+    <div class="footer-col">
+      <h4>Ayuda</h4>
+      <a href="#">Envíos y entregas</a>
+      <a href="#">Devoluciones</a>
+      <a href="#">Garantía</a>
+      <a href="#">Preguntas frecuentes</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>&copy; 2024 RubyTech. Todos los derechos reservados. Diseñado con <i class="fa-solid fa-heart" style="color:var(--red)"></i></p>
+  </div>
+</footer>
+
+<script>
+  // Navbar scroll effect
+  window.addEventListener('scroll', () => {
+    const nav = document.getElementById('navbar');
+    nav?.classList.toggle('scrolled', window.scrollY > 50);
+  });
+
+  // Mobile menu toggle
+  document.getElementById('menuToggle')?.addEventListener('click', () => {
+    document.getElementById('navLinks')?.classList.toggle('open');
+  });
+
+  // Marcar enlace activo
+  const links = document.querySelectorAll('.nav-link');
+  links.forEach(link => {
+    if (link.getAttribute('href') === window.location.pathname) {
+      link.classList.add('active');
+    }
+  });
+</script>
+
+</body>
+</html>
