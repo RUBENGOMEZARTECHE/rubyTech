@@ -90,9 +90,36 @@ const icon = catSlug === 'moviles' ? 'fa-mobile-screen-button' : catSlug === 'po
   </section>
 </MainLayout>
 
-<script>
-  const btn = document.getElementById('btnCart');
-  btn?.addEventListener('click', () => {
+<script define:vars={{ producto: { id: p.documentId, name: p.name, brand: p.brand, price: p.price, catSlug: p.category?.slug } }}>
+  function getCarrito() {
+    return JSON.parse(localStorage.getItem('carrito') || '[]');
+  }
+
+  function saveCarrito(carrito) {
+    localStorage.setItem('carrito', JSON.stringify(carrito));
+    const total = carrito.reduce((t, i) => t + i.cantidad, 0);
+    const badge = document.querySelector('.nav-cart .badge');
+    if (badge) badge.textContent = total.toString();
+  }
+
+  // Actualizar contador al cargar
+  const carrito = getCarrito();
+  const totalItems = carrito.reduce((t, i) => t + i.cantidad, 0);
+  const badge = document.querySelector('.nav-cart .badge');
+  if (badge) badge.textContent = totalItems.toString();
+
+  // Botón añadir al carrito
+  document.getElementById('btnCart')?.addEventListener('click', () => {
+    const carrito = getCarrito();
+    const existing = carrito.find(i => i.id === producto.id);
+    if (existing) {
+      existing.cantidad += 1;
+    } else {
+      carrito.push({ ...producto, cantidad: 1 });
+    }
+    saveCarrito(carrito);
+
+    const btn = document.getElementById('btnCart');
     btn.innerHTML = '<i class="fa-solid fa-check"></i> ¡Añadido!';
     btn.style.background = 'linear-gradient(135deg, #00b894, #55efc4)';
     setTimeout(() => {

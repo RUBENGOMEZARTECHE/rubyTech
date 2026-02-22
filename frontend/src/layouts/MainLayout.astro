@@ -31,7 +31,7 @@ const { title = 'RubyTech' } = Astro.props;
     <a href="/contacto" class="nav-link"><i class="fa-solid fa-envelope"></i> Contacto</a>
   </div>
   <div style="display:flex;align-items:center;gap:.6rem">
-    <button class="nav-cart">
+    <button class="nav-cart" id="btnCarrito">
       <i class="fa-solid fa-cart-shopping"></i>
       <span class="badge">0</span>
     </button>
@@ -101,6 +101,154 @@ const { title = 'RubyTech' } = Astro.props;
     if (link.getAttribute('href') === window.location.pathname) {
       link.classList.add('active');
     }
+  });
+</script>
+
+<!-- CARRITO LATERAL -->
+<div id="carritoOverlay" class="hidden fixed inset-0 bg-black/60 z-[1999] backdrop-blur-sm"></div>
+
+<div id="carritoPanel" class="fixed top-0 right-[-420px] w-[420px] h-screen z-[2000] flex flex-col transition-all duration-300" style="background:var(--bg2);border-left:1px solid rgba(255,255,255,.08)">
+
+  <!-- HEADER -->
+  <div class="flex justify-between items-center p-6" style="border-bottom:1px solid rgba(255,255,255,.08)">
+    <h3 class="text-xl font-black">🛒 Tu carrito</h3>
+    <button id="cerrarCarrito" class="w-9 h-9 rounded-xl cursor-pointer text-lg" style="background:var(--bg3);border:none;color:var(--text)">✕</button>
+  </div>
+
+  <!-- ITEMS -->
+  <div id="carritoItems" class="flex-1 overflow-y-auto p-4"></div>
+
+  <!-- VACÍO -->
+  <div id="carritoVacio" class="hidden flex-1 flex-col items-center justify-center gap-4 text-center p-8">
+    <i class="fa-solid fa-cart-shopping text-5xl" style="color:var(--text3)"></i>
+    <p style="color:var(--text3)">Tu carrito está vacío</p>
+    <a href="/catalogo" class="btn btn-primary" onclick="cerrarCarrito()"><i class="fa-solid fa-bag-shopping"></i> Ver Catálogo</a>
+  </div>
+
+  <!-- FOOTER -->
+  <div id="carritoFooter" class="hidden p-6" style="border-top:1px solid rgba(255,255,255,.08)">
+    <div class="flex justify-between mb-2 text-sm" style="color:var(--text2)">
+      <span>Subtotal</span><span id="carritoSubtotal">0€</span>
+    </div>
+    <div class="flex justify-between mb-4 text-sm" style="color:var(--text2)">
+      <span>Envío</span><span style="color:var(--green)">Gratis</span>
+    </div>
+    <div class="flex justify-between font-black text-xl mb-6" style="border-top:1px solid rgba(255,255,255,.08);padding-top:1rem">
+      <span>Total</span>
+      <span id="carritoTotal" style="background:linear-gradient(135deg,var(--primary),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent">0€</span>
+    </div>
+    <button class="btn btn-primary w-full justify-center" onclick="alert('¡Gracias por tu compra!')">
+      <i class="fa-solid fa-credit-card"></i> Finalizar compra
+    </button>
+  </div>
+
+</div>
+
+<script is:inline>
+  function getCarrito() {
+    return JSON.parse(localStorage.getItem('carrito') || '[]');
+  }
+
+  function saveCarrito(carrito) {
+    localStorage.setItem('carrito', JSON.stringify(carrito));
+    actualizarBadge();
+  }
+
+  function actualizarBadge() {
+    var carrito = getCarrito();
+    var total = carrito.reduce(function(t, i) { return t + i.cantidad; }, 0);
+    var badge = document.querySelector('.nav-cart .badge');
+    if (badge) badge.textContent = total.toString();
+  }
+
+  function getIcono(catSlug) {
+    if (catSlug === 'moviles') return 'fa-mobile-screen-button';
+    if (catSlug === 'portatiles') return 'fa-laptop';
+    return 'fa-desktop';
+  }
+
+  function renderCarrito() {
+    var carrito = getCarrito();
+    var itemsEl = document.getElementById('carritoItems');
+    var vacioEl = document.getElementById('carritoVacio');
+    var footerEl = document.getElementById('carritoFooter');
+
+    if (!itemsEl) return;
+
+    if (carrito.length === 0) {
+      itemsEl.style.display = 'none';
+      vacioEl.style.display = 'flex';
+      footerEl.style.display = 'none';
+      return;
+    }
+
+    vacioEl.style.display = 'none';
+    itemsEl.style.display = 'block';
+    footerEl.style.display = 'block';
+
+    var html = '';
+    for (var i = 0; i < carrito.length; i++) {
+      var item = carrito[i];
+      html += '<div class="rounded-xl p-4 mb-3 grid gap-3 items-center" style="background:var(--bg3);grid-template-columns:50px 1fr">';
+      html += '<div class="w-12 h-12 rounded-lg flex items-center justify-center text-xl" style="background:var(--bg4);color:rgba(255,255,255,.2)">';
+      html += '<i class="fa-solid ' + getIcono(item.catSlug) + '"></i></div>';
+      html += '<div>';
+      html += '<div class="text-xs font-bold uppercase tracking-widest" style="color:var(--accent)">' + item.brand + '</div>';
+      html += '<div class="font-bold text-sm my-1">' + item.name + '</div>';
+      html += '<div class="flex items-center justify-between mt-2">';
+      html += '<div class="flex items-center gap-2">';
+      html += '<button onclick="cambiarCantidad(\'' + item.id + '\', -1)" class="w-7 h-7 rounded-lg cursor-pointer text-base" style="background:var(--bg2);color:var(--text);border:1px solid rgba(255,255,255,.1)">−</button>';
+      html += '<span class="font-bold text-sm">' + item.cantidad + '</span>';
+      html += '<button onclick="cambiarCantidad(\'' + item.id + '\', 1)" class="w-7 h-7 rounded-lg cursor-pointer text-base" style="background:var(--bg2);color:var(--text);border:1px solid rgba(255,255,255,.1)">+</button>';
+      html += '</div>';
+      html += '<div class="flex items-center gap-3">';
+      html += '<span class="font-black text-sm" style="background:linear-gradient(135deg,var(--primary),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent">' + (item.price * item.cantidad).toLocaleString('es-ES') + '€</span>';
+      html += '<button onclick="eliminarItem(\'' + item.id + '\')" class="cursor-pointer text-sm" style="background:none;border:none;color:var(--red)"><i class="fa-solid fa-trash"></i></button>';
+      html += '</div></div></div></div>';
+    }
+    itemsEl.innerHTML = html;
+
+    var total = carrito.reduce(function(t, i) { return t + i.price * i.cantidad; }, 0);
+    document.getElementById('carritoSubtotal').textContent = total.toLocaleString('es-ES') + '€';
+    document.getElementById('carritoTotal').textContent = total.toLocaleString('es-ES') + '€';
+  }
+
+  function abrirCarrito() {
+    document.getElementById('carritoPanel').style.right = '0';
+    document.getElementById('carritoOverlay').classList.remove('hidden');
+    document.getElementById('carritoOverlay').classList.add('block');
+    renderCarrito();
+  }
+
+  function cerrarCarrito() {
+    document.getElementById('carritoPanel').style.right = '-420px';
+    document.getElementById('carritoOverlay').classList.add('hidden');
+    document.getElementById('carritoOverlay').classList.remove('block');
+  }
+
+  window.cambiarCantidad = function(id, delta) {
+    var carrito = getCarrito();
+    for (var i = 0; i < carrito.length; i++) {
+      if (carrito[i].id === id) {
+        carrito[i].cantidad += delta;
+        if (carrito[i].cantidad <= 0) carrito.splice(i, 1);
+        break;
+      }
+    }
+    saveCarrito(carrito);
+    renderCarrito();
+  }
+
+  window.eliminarItem = function(id) {
+    saveCarrito(getCarrito().filter(function(i) { return i.id !== id; }));
+    renderCarrito();
+  }
+
+  document.addEventListener('DOMContentLoaded', function() {
+    actualizarBadge();
+    document.getElementById('btnCarrito').addEventListener('click', abrirCarrito);
+    document.getElementById('cerrarCarrito').addEventListener('click', cerrarCarrito);
+    document.getElementById('carritoOverlay').addEventListener('click', cerrarCarrito);
   });
 </script>
 
