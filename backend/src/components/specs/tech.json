@@ -1,0 +1,25 @@
+{
+  "collectionName": "components_specs_teches",
+  "info": {
+    "displayName": "tech"
+  },
+  "options": {},
+  "attributes": {
+    "processor": {
+      "type": "string"
+    },
+    "ram": {
+      "type": "string"
+    },
+    "storage": {
+      "type": "string"
+    },
+    "screen": {
+      "type": "string"
+    },
+    "battery": {
+      "type": "string"
+    }
+  },
+  "config": {}
+}

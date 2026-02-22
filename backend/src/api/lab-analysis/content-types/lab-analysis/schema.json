@@ -1,0 +1,43 @@
+{
+  "kind": "collectionType",
+  "collectionName": "lab_analyses",
+  "info": {
+    "singularName": "lab-analysis",
+    "pluralName": "lab-analyses",
+    "displayName": "LabAnalysis"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": true
+    },
+    "chartType": {
+      "type": "enumeration",
+      "enum": [
+        "bar",
+        "line",
+        "pie",
+        "radar"
+      ]
+    },
+    "data": {
+      "type": "json"
+    },
+    "description": {
+      "type": "text"
+    },
+    "publishedDate": {
+      "type": "date"
+    },
+    "category": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::category.category",
+      "inversedBy": "lab_analyses"
+    }
+  }
+}
