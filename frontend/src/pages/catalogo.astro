@@ -38,7 +38,10 @@ const categories = await getCategories();
                 {p.badge === 'new' ? 'Nuevo' : p.badge === 'sale' ? 'Oferta' : 'Popular'}
               </span>
             )}
-            <i class={`fa-solid ${p.category?.slug === 'moviles' ? 'fa-mobile-screen-button' : p.category?.slug === 'portatiles' ? 'fa-laptop' : 'fa-desktop'}`}></i>
+            {p.image?.url
+              ? <img src={`http://46.62.132.241:1337${p.image.url}`} alt={p.name} style="width:100%;height:100%;object-fit:contain;padding:1rem" />
+              : <i class={`fa-solid ${p.category?.slug === 'moviles' ? 'fa-mobile-screen-button' : p.category?.slug === 'portatiles' ? 'fa-laptop' : 'fa-desktop'}`}></i>
+            }
             <span class="quick-view"><i class="fa-solid fa-eye"></i> Ver detalles</span>
           </div>
           <div class="product-info">
