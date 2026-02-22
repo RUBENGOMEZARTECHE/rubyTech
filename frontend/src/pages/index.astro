@@ -70,8 +70,7 @@ const featured = products.filter((p: any) => p.badge === 'hot' || p.rating >= 4.
     <div class="category-grid fade-up">
       {categories.map((cat: any) => (
         <a href={`/catalogo?cat=${cat.slug}`} class="category-card">
-          <div class={`cat-bg ${cat.slug}`}>
-            <i class={`fa-solid ${cat.slug === 'moviles' ? 'fa-mobile-screen-button' : cat.slug === 'portatiles' ? 'fa-laptop' : 'fa-desktop'}`}></i>
+          <div class={`cat-bg ${cat.slug}`} style={`background-image:url('/images/${cat.slug === 'ordenadores-de-sobremesa' ? 'sobremesa' : cat.slug}.jpg');background-size:cover;background-position:center`}>
           </div>
           <div class="cat-overlay">
             <div class="cat-arrow"><i class="fa-solid fa-arrow-right"></i></div>
