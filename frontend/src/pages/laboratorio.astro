@@ -69,26 +69,26 @@ const badgesJSON = JSON.stringify(badges);
         <i class="fa-solid fa-flask"></i> Análisis en tiempo real
       </div>
       <div class = "pb-4">
-        <h1 class="text-5xl font-black mb-4">RubyTech <span class="gradient">Intelligence</span></h1>
+        <h1 class="text-5xl font-black" style="margin:1.5rem 0">RubyTech <span class="gradient">Intelligence</span></h1>
       </div>
-      <p class="text-lg" style="color:var(--text2)">Panel de análisis avanzado generado automáticamente con los datos del catálogo</p>
+      <p class="text-lg" style="color:var(--text2);margin-top:1rem">Panel de análisis avanzado generado automáticamente con los datos del catálogo</p>
     </div>
 
     <!-- KPIs -->
     <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:1.5rem;margin-bottom:3rem">
-      <div class="rounded-2xl p-6 text-center" style="background:var(--bg2);border:1px solid rgba(255,255,255,.05)">
+      <div class="rounded-2xl text-center" style="background:var(--bg2);border:1px solid rgba(255,255,255,.05);padding:2.5rem 1rem">
         <div class="text-4xl font-black mb-1" style="background:linear-gradient(135deg,var(--primary),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent">{totalProductos}</div>
         <div class="text-sm" style="color:var(--text3)">Productos totales</div>
       </div>
-      <div class="rounded-2xl p-6 text-center" style="background:var(--bg2);border:1px solid rgba(255,255,255,.05)">
+      <div class="rounded-2xl text-center" style="background:var(--bg2);border:1px solid rgba(255,255,255,.05);padding:2.5rem 1rem">
         <div class="text-4xl font-black mb-1" style="background:linear-gradient(135deg,var(--primary),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent">{precioMedio.toLocaleString('es-ES')}€</div>
         <div class="text-sm" style="color:var(--text3)">Precio medio</div>
       </div>
-      <div class="rounded-2xl p-6 text-center" style="background:var(--bg2);border:1px solid rgba(255,255,255,.05)">
+      <div class="rounded-2xl text-center" style="background:var(--bg2);border:1px solid rgba(255,255,255,.05);padding:2.5rem 1rem">
         <div class="text-4xl font-black mb-1" style="background:linear-gradient(135deg,var(--primary),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent">{marcas.length}</div>
         <div class="text-sm" style="color:var(--text3)">Marcas distintas</div>
       </div>
-      <div class="rounded-2xl p-6 text-center" style="background:var(--bg2);border:1px solid rgba(255,255,255,.05)">
+      <div class="rounded-2xl text-center" style="background:var(--bg2);border:1px solid rgba(255,255,255,.05);padding:2.5rem 1rem">
         <div class="text-4xl font-black mb-1" style="background:linear-gradient(135deg,var(--primary),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent">{totalOfertas}</div>
         <div class="text-sm" style="color:var(--text3)">En oferta o tendencia</div>
       </div>
@@ -98,21 +98,21 @@ const badgesJSON = JSON.stringify(badges);
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:3rem">
 
       <!-- Precios por categoría -->
-      <div class="rounded-2xl p-6" style="background:var(--bg2);border:1px solid rgba(255,255,255,.05)">
+      <div class="rounded-2xl p-8" style="background:var(--bg2);border:1px solid rgba(255,255,255,.05);padding:2rem">
         <h3 class="font-bold text-lg mb-1">Precios por categoría</h3>
         <p class="text-sm mb-6" style="color:var(--text3)">Media, máximo y mínimo en €</p>
         <canvas id="chartCategorias" height="250"></canvas>
       </div>
 
       <!-- Marcas -->
-      <div class="rounded-2xl p-6" style="background:var(--bg2);border:1px solid rgba(255,255,255,.05)">
+      <div class="rounded-2xl p-6" style="background:var(--bg2);border:1px solid rgba(255,255,255,.05);padding:2rem">
         <h3 class="font-bold text-lg mb-1">Ranking de marcas</h3>
         <p class="text-sm mb-6" style="color:var(--text3)">Productos por marca</p>
         <canvas id="chartMarcas" height="250"></canvas>
       </div>
 
       <!-- Badges -->
-      <div class="rounded-2xl p-6" style="background:var(--bg2);border:1px solid rgba(255,255,255,.05)">
+      <div class="rounded-2xl p-6" style="background:var(--bg2);border:1px solid rgba(255,255,255,.05);padding:2rem">
         <h3 class="font-bold text-lg mb-1">Distribución de badges</h3>
         <p class="text-sm mb-6" style="color:var(--text3)">Clasificación del catálogo</p>
         <div class="flex items-center justify-center">
@@ -121,7 +121,7 @@ const badgesJSON = JSON.stringify(badges);
       </div>
 
       <!-- Rango de precios -->
-      <div class="rounded-2xl p-6" style="background:var(--bg2);border:1px solid rgba(255,255,255,.05)">
+      <div class="rounded-2xl p-6" style="background:var(--bg2);border:1px solid rgba(255,255,255,.05);padding:2rem">
         <h3 class="font-bold text-lg mb-1">Rango de precios</h3>
         <p class="text-sm mb-6" style="color:var(--text3)">Distribución min/max por categoría</p>
         <canvas id="chartRango" height="250"></canvas>
@@ -130,8 +130,8 @@ const badgesJSON = JSON.stringify(badges);
     </div>
 
     <!-- INSIGHTS -->
-    <div class="rounded-2xl p-8" style="background:var(--bg2);border:1px solid rgba(108,92,231,.2)">
-      <div class="flex items-center gap-3 mb-6">
+    <div class="rounded-2xl" style="background:var(--bg2);border:1px solid rgba(108,92,231,.2);padding:2.5rem">
+      <div class="flex items-center gap-3" style="margin-bottom:2rem">
         <div class="w-10 h-10 rounded-xl flex items-center justify-center" style="background:linear-gradient(135deg,var(--primary),var(--accent))">
           <i class="fa-solid fa-brain text-white"></i>
         </div>
@@ -142,7 +142,7 @@ const badgesJSON = JSON.stringify(badges);
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
         {insights.map((insight, i) => (
-          <div class="flex items-start gap-3 p-4 rounded-xl" style="background:var(--bg3)">
+          <div class="flex items-start gap-3 rounded-xl" style="background:var(--bg3);padding:1.2rem 1.5rem">
             <div class="w-6 h-6 rounded-full flex items-center justify-center text-xs font-black flex-shrink-0 mt-0.5" style="background:linear-gradient(135deg,var(--primary),var(--accent));color:white">{i + 1}</div>
             <p class="text-sm" style="color:var(--text2)">{insight}</p>
           </div>
