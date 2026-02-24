@@ -51,12 +51,55 @@ const categories = await getCategories();
               <span class="price-current">{p.price.toLocaleString('es-ES')}€</span>
               {p.previousPrice && <span class="price-old">{p.previousPrice.toLocaleString('es-ES')}€</span>}
             </div>
+            <button class="btn-comprar"
+              data-id={p.documentId}
+              data-name={p.name}
+              data-brand={p.brand}
+              data-price={p.price}
+              data-cat={p.category?.slug}
+              style="margin-top:.8rem;width:100%;padding:.6rem;border-radius:10px;font-weight:700;font-size:.85rem;cursor:pointer;background:rgba(108,92,231,.3);border:1px solid rgba(108,92,231,.5);color:white;border:none;transition:var(--transition)">
+              COMPRAR
+            </button>
           </div>
         </a>
       ))}
     </div>
     <div class="products-count" id="productsCount"></div>
   </section>
+
+  <script is:inline>
+  document.querySelectorAll('.btn-comprar').forEach(function(btn) {
+    btn.addEventListener('click', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      var carrito = JSON.parse(localStorage.getItem('carrito') || '[]');
+      var id = btn.getAttribute('data-id');
+      var existing = carrito.find(function(i) { return i.id === id; });
+      if (existing) {
+        existing.cantidad += 1;
+      } else {
+        carrito.push({
+          id: id,
+          name: btn.getAttribute('data-name'),
+          brand: btn.getAttribute('data-brand'),
+          price: parseFloat(btn.getAttribute('data-price')),
+          catSlug: btn.getAttribute('data-cat'),
+          cantidad: 1
+        });
+      }
+      localStorage.setItem('carrito', JSON.stringify(carrito));
+      var total = carrito.reduce(function(t, i) { return t + i.cantidad; }, 0);
+      var badge = document.querySelector('.nav-cart .badge');
+      if (badge) badge.textContent = total.toString();
+      btn.innerHTML = '<i class="fa-solid fa-check"></i> ¡Añadido!';
+      btn.style.background = 'linear-gradient(135deg,#6ee7b7,#34d399)';
+      setTimeout(function() {
+        btn.innerHTML = 'COMPRAR';
+        btn.style.background = 'rgba(108,92,231,.3)';
+      }, 1500);
+    });
+  });
+</script>
 </MainLayout>
 
 <script>
