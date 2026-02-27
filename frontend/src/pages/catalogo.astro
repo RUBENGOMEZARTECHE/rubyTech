@@ -65,6 +65,7 @@ const categories = await getCategories();
       ))}
     </div>
     <div class="products-count" id="productsCount"></div>
+    <div id="paginacion" style="display:none;justify-content:center;gap:.5rem;margin-top:2rem"></div>
   </section>
 
   <script is:inline>
@@ -91,7 +92,9 @@ const categories = await getCategories();
       var total = carrito.reduce(function(t, i) { return t + i.cantidad; }, 0);
       var badge = document.querySelector('.nav-cart .badge');
       if (badge) badge.textContent = total.toString();
-      btn.innerHTML = '<i class="fa-solid fa-check"></i> ¡Añadido!';
+      btn.innerhtml += '<div class="rounded-xl mb-3 grid gap-3 items-center" style="background:var(--bg3);grid-template-columns:50px 1fr;padding:1rem 1.2rem">';
+      html += '<div class="w-12 h-12 rounded-lg flex items-center justify-center text-xl" style="background:var(--bg4);color:rgba(255,255,255,.2)">';
+      html += '<i class="fa-solid ' + getIcono(item.catSlug) + '"></i></div>';TML = '<i class="fa-solid fa-check"></i> ¡Añadido!';
       btn.style.background = 'linear-gradient(135deg,#6ee7b7,#34d399)';
       setTimeout(function() {
         btn.innerHTML = 'COMPRAR';
@@ -104,27 +107,67 @@ const categories = await getCategories();
 
 <script>
   const cards = document.querySelectorAll('.product-card') as NodeListOf<HTMLElement>;
-  const countEl = document.getElementById('productsCount');
+const countEl = document.getElementById('productsCount');
+const paginacionEl = document.getElementById('paginacion');
 
-  function updateCount() {
-    const visible = [...cards].filter(c => c.style.display !== 'none').length;
-    if (countEl) countEl.textContent = `Mostrando ${visible} de ${cards.length} productos`;
+const ITEMS_POR_PAGINA = 12;
+let paginaActual = 1;
+let filtroActivo = 'all';
+
+function getVisibles() {
+  return [...cards].filter(c => {
+    if (filtroActivo === 'all') return true;
+    return c.getAttribute('data-cat') === filtroActivo;
+  });
+}
+
+function render() {
+    const visibles = getVisibles();
+    const totalPaginas = filtroActivo === 'all' ? Math.ceil(visibles.length / ITEMS_POR_PAGINA) : 1;
+
+    cards.forEach(c => c.style.display = 'none');
+
+    if (filtroActivo === 'all') {
+      const inicio = (paginaActual - 1) * ITEMS_POR_PAGINA;
+      const fin = inicio + ITEMS_POR_PAGINA;
+      visibles.slice(inicio, fin).forEach(c => c.style.display = '');
+    } else {
+    visibles.forEach(c => c.style.display = '');
+    }
+
+    if (countEl) countEl.textContent = `Mostrando ${visibles.length} productos`;
+
+    if (paginacionEl) {
+      if (filtroActivo === 'all' && totalPaginas > 1) {
+        let html = '';
+        for (let i = 1; i <= totalPaginas; i++) {
+          html += `<button class="pag-btn" data-page="${i}" style="width:38px;height:38px;border-radius:10px;cursor:pointer;font-weight:700;font-size:.9rem;border:1px solid rgba(255,255,255,.1);background:${i === paginaActual ? 'linear-gradient(135deg,var(--primary),var(--primary2))' : 'var(--bg3)'};color:var(--text);transition:var(--transition)">${i}</button>`;
+        }
+        paginacionEl.innerHTML = html;
+        paginacionEl.style.display = 'flex';
+        document.querySelectorAll('.pag-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            paginaActual = parseInt(btn.getAttribute('data-page')!);
+            render();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          });
+        });
+      } else {
+        paginacionEl.style.display = 'none';
+      }
+    }
   }
 
-  // Filtro por categoría
   document.querySelectorAll('.filter-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
-      const cat = btn.getAttribute('data-cat');
-      cards.forEach(card => {
-        card.style.display = (cat === 'all' || card.getAttribute('data-cat') === cat) ? '' : 'none';
-      });
-      updateCount();
+      filtroActivo = btn.getAttribute('data-cat')!;
+      paginaActual = 1;
+      render();
     });
   });
 
-  // Búsqueda
   document.getElementById('searchInput')?.addEventListener('input', (e) => {
     const val = (e.target as HTMLInputElement).value.toLowerCase();
     cards.forEach(card => {
@@ -132,10 +175,8 @@ const categories = await getCategories();
       const brand = card.querySelector('.product-brand')?.textContent?.toLowerCase() || '';
       card.style.display = (name.includes(val) || brand.includes(val)) ? '' : 'none';
     });
-    updateCount();
   });
 
-  // Activar filtro desde URL
   const params = new URLSearchParams(window.location.search);
   const catParam = params.get('cat');
   if (catParam) {
@@ -143,5 +184,5 @@ const categories = await getCategories();
     if (btn) btn.click();
   }
 
-  updateCount();
+  render();
 </script>
