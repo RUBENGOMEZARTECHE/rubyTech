@@ -23,6 +23,32 @@ const categories = await getCategories();
           </button>
         ))}
       </div>
+
+      <div class="relative" style="margin-left:auto">
+        <button id="btnFiltros" class="flex items-center gap-2 rounded-full text-sm font-medium cursor-pointer transition-all" style="background:var(--bg3);color:var(--text2);border:1px solid transparent;padding:.55rem 1.3rem">
+          <i class="fa-solid fa-sliders"></i> Filtrar
+        </button>
+        <div id="panelFiltros" class="hidden rounded-2xl" style="position:absolute;top:calc(100% + .5rem);right:0;width:280px;z-index:100;background:var(--bg2);border:1px solid rgba(255,255,255,.08);padding:2rem">
+    
+          <h4 class="text-sm font-bold" style="color:var(--text);margin-bottom:1rem">Ordenar por precio</h4>
+          <div class="flex flex-col" style="gap:.6rem;margin-bottom:1.5rem">
+            <button class="orden-btn text-left px-3 py-2 rounded-xl text-sm cursor-pointer" data-orden="asc" style="background:var(--bg3);color:var(--text2);border:1px solid transparent">
+              <i class="fa-solid fa-arrow-up"></i> Precio: menor a mayor
+            </button>
+            <button class="orden-btn text-left px-3 py-2 rounded-xl text-sm cursor-pointer" data-orden="desc" style="background:var(--bg3);color:var(--text2);border:1px solid transparent">
+              <i class="fa-solid fa-arrow-down"></i> Precio: mayor a menor
+            </button>
+            <button class="orden-btn text-left px-3 py-2 rounded-xl text-sm cursor-pointer" data-orden="none" style="background:var(--bg3);color:var(--text2);border:1px solid transparent">
+              <i class="fa-solid fa-rotate-left"></i> Sin ordenar
+            </button>
+        </div>
+
+        <h4 class="text-sm font-bold" style="color:var(--text);margin-bottom:1rem">Filtrar por marca</h4>
+        <div id="marcasFiltro" class="flex flex-wrap gap-2"></div>
+
+        </div>
+      </div>
+
       <div class="search-box">
         <i class="fa-solid fa-magnifying-glass"></i>
         <input type="text" id="searchInput" placeholder="Buscar producto..." />
@@ -183,6 +209,100 @@ function render() {
     const btn = document.querySelector(`[data-cat="${catParam}"]`) as HTMLElement;
     if (btn) btn.click();
   }
+
+  // Filtro panel
+  document.getElementById('btnFiltros')?.addEventListener('click', () => {
+    const panel = document.getElementById('panelFiltros')!;
+    panel.classList.toggle('hidden');
+  });
+
+  // Cerrar panel al hacer clic fuera
+  document.addEventListener('click', (e) => {
+    const panel = document.getElementById('panelFiltros')!;
+    const btn = document.getElementById('btnFiltros')!;
+    if (!panel.contains(e.target as Node) && !btn.contains(e.target as Node)) {
+      panel.classList.add('hidden');
+    }
+  });
+
+  // Marcas
+  const marcasSet = new Set<string>();
+  cards.forEach(c => {
+    const brand = c.querySelector('.product-brand')?.textContent?.trim();
+    if (brand) marcasSet.add(brand);
+  });
+
+  const marcasFiltroEl = document.getElementById('marcasFiltro')!;
+  let marcaActiva = '';
+
+  marcasSet.forEach(marca => {
+    const btn = document.createElement('button');
+    btn.textContent = marca;
+    btn.className = 'px-3 py-1 rounded-full text-xs font-medium cursor-pointer';
+    btn.style.cssText = 'background:var(--bg3);color:var(--text2);border:1px solid transparent';
+    btn.addEventListener('click', () => {
+      if (marcaActiva === marca) {
+        marcaActiva = '';
+        btn.style.background = 'var(--bg3)';
+        btn.style.color = 'var(--text2)';
+      } else {
+        marcaActiva = marca;
+        marcasFiltroEl.querySelectorAll('button').forEach(b => {
+          (b as HTMLElement).style.background = 'var(--bg3)';
+          (b as HTMLElement).style.color = 'var(--text2)';
+        });
+        btn.style.background = 'linear-gradient(135deg,var(--primary),var(--primary2))';
+        btn.style.color = 'white';
+      }
+      filtrarPorMarca();
+    });
+    marcasFiltroEl.appendChild(btn);
+  });
+
+  function filtrarPorMarca() {
+    cards.forEach(c => {
+      const brand = c.querySelector('.product-brand')?.textContent?.trim();
+      if (marcaActiva && brand !== marcaActiva) {
+        c.style.display = 'none';
+      } else {
+        c.style.display = '';
+      }
+    });
+    render();
+  }
+
+  // Ordenar por precio
+  document.querySelectorAll('.orden-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const orden = btn.getAttribute('data-orden');
+      document.querySelectorAll('.orden-btn').forEach(b => {
+        (b as HTMLElement).style.background = 'var(--bg3)';
+        (b as HTMLElement).style.color = 'var(--text2)';
+      });
+      (btn as HTMLElement).style.background = 'linear-gradient(135deg,var(--primary),var(--primary2))';
+      (btn as HTMLElement).style.color = 'white';
+
+      const grid = document.getElementById('catalogProducts')!;
+      const cardsArr = [...cards];
+
+      if (orden === 'asc') {
+        cardsArr.sort((a, b) => {
+          const pa = parseFloat(a.querySelector('.price-current')?.textContent?.replace('€','').replace('.','').replace(',','.') || '0');
+          const pb = parseFloat(b.querySelector('.price-current')?.textContent?.replace('€','').replace('.','').replace(',','.') || '0');
+          return pa - pb;
+        });
+      } else if (orden === 'desc') {
+        cardsArr.sort((a, b) => {
+          const pa = parseFloat(a.querySelector('.price-current')?.textContent?.replace('€','').replace('.','').replace(',','.') || '0');
+          const pb = parseFloat(b.querySelector('.price-current')?.textContent?.replace('€','').replace('.','').replace(',','.') || '0');
+          return pb - pa;
+        });
+      }
+
+      cardsArr.forEach(c => grid.appendChild(c));
+      render();
+    });
+  });
 
   render();
 </script>
