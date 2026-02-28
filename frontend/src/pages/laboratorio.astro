@@ -2,28 +2,28 @@
 import MainLayout from '../layouts/MainLayout.astro';
 import { getProducts } from '../lib/api.js';
 
-const products = await getProducts();
+const products = await getProducts(); //Obtiene los productos de strapi y los guarda en la variable products
 
 // Calcular estadísticas
 const totalProductos = products.length;
-const precioMedio = Math.round(products.reduce((t: any, p: any) => t + p.price, 0) / totalProductos);
-const precioMax = Math.max(...products.map((p: any) => p.price));
-const precioMin = Math.min(...products.map((p: any) => p.price));
+const precioMedio = Math.round(products.reduce((acum: any, p: any) => acum + p.price, 0) / totalProductos); //Math.round redondea a un numero entero - Aqui queremos recorrer todos los productos y sumar todos los precios
+const precioMax = Math.max(...products.map((p: any) => p.price)); //Aqui buscamos el precio mas alto de todos los productos - el spread convierte el arrya en valores sueltos - Math.max devuelve el numero mas alto de todos los valores
+const precioMin = Math.min(...products.map((p: any) => p.price)); //Al contrario
 
 // Por categoría
 const categorias = ['moviles', 'portatiles', 'ordenadores-de-sobremesa'];
-const nombresCat: Record<string, string> = {
+const nombresCat: Record<string, string> = { //En este caso añadiremos esta sentencia de TypeScript si no se nos romepra el codigo mas abajo. tiene claves de tipo texto y valores de tipo texto
   'moviles': 'Móviles',
   'portatiles': 'Portátiles',
   'ordenadores-de-sobremesa': 'Sobremesa'
 };
 
-const statsPorCategoria = categorias.map((slug) => {
-  const prods = products.filter((p: any) => p.category?.slug === slug);
-  const media = prods.length > 0 ? Math.round(prods.reduce((t: any, p: any) => t + p.price, 0) / prods.length) : 0;
-  const max = prods.length > 0 ? Math.max(...prods.map((p: any) => p.price)) : 0;
+const statsPorCategoria = categorias.map((slug) => { //Recorr eel array categorias y el resultado del codigo lo guarda aqui
+  const prods = products.filter((p: any) => p.category?.slug === slug); //Filtra todos los productos y se queda solo con los que pertenecen a la categoria actual. p: any = cada producto sin importarme el tipo de dato. Si no hay productos devolverá 0
+  const media = prods.length > 0 ? Math.round(prods.reduce((acum: any, p: any) => acum + p.price, 0) / prods.length) : 0; //calculamos el precio medio de los productos de esta categoria
+  const max = prods.length > 0 ? Math.max(...prods.map((p: any) => p.price)) : 0; //Buscamos el precio mas alto de esta categoria, recorremos todos los productos con .map
   const min = prods.length > 0 ? Math.min(...prods.map((p: any) => p.price)) : 0;
-  return { slug, nombre: nombresCat[slug], total: prods.length, media, max, min, productos: prods };
+  return { slug, nombre: nombresCat[slug], total: prods.length, media, max, min, productos: prods }; //devolvera un objeto con toda la info de esta categoria
 });
 
 // Marcas
@@ -153,7 +153,9 @@ const badgesJSON = JSON.stringify(badges);
   </section>
 </MainLayout>
 
-<script is:inline src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+{/*IMPORTAMOS LIBRERIA CHART.JS */}
+<script is:inline src="https://cdn.jsdelivr.net/npm/chart.js"></script> 
 <script define:vars={{ statsCategoriasJSON, marcasJSON, badgesJSON }}>
   const statsCategorias = JSON.parse(statsCategoriasJSON);
   const marcas = JSON.parse(marcasJSON);

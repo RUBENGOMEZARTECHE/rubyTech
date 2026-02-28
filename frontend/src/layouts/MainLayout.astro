@@ -1,8 +1,16 @@
 ---
 export interface Props {
   title?: string;
+  metaTitle?: string;
+  metaDescription?: string;
+  keywords?: string;
 }
-const { title = 'RubyTech' } = Astro.props;
+const { //CONECTAMOS EL FRONTEND CON EL SEO
+  title = 'RubyTech',
+  metaTitle,
+  metaDescription = 'RubyTech - Tu tienda de tecnología premium. Móviles, portátiles y ordenadores de sobremesa con las mejores ofertas del mercado.',
+  keywords = 'tecnología, móviles, portátiles, ordenadores, RubyTech'
+} = Astro.props;
 ---
 
 <!DOCTYPE html>
@@ -10,7 +18,12 @@ const { title = 'RubyTech' } = Astro.props;
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>{title} — RubyTech</title>
+  <title>{metaTitle || title + ' — RubyTech'}</title>
+  <meta name="description" content={metaDescription} />
+  <meta name="keywords" content={keywords} />
+  <meta property="og:title" content={metaTitle || title + ' — RubyTech'} />
+  <meta property="og:description" content={metaDescription} />
+  <meta name="robots" content="index, follow" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
@@ -21,42 +34,42 @@ const { title = 'RubyTech' } = Astro.props;
 <!-- NAVIGATION -->
 <nav class="nav" id="navbar">
   <a href="/" class="nav-logo">
-    <i class="fa-solid fa-gem"></i>
+    <span class="fa-solid fa-gem"></span>
     <span>RubyTech</span>
   </a>
   <div class="nav-links" id="navLinks">
-    <a href="/" class="nav-link"><i class="fa-solid fa-house"></i> Inicio</a>
-    <a href="/catalogo" class="nav-link"><i class="fa-solid fa-grid-2"></i> Catálogo</a>
-    <a href="/blog" class="nav-link"><i class="fa-solid fa-newspaper"></i> Blog</a>
-    <a href="/laboratorio" class="nav-link"><i class="fa-solid fa-flask"></i> Laboratorio</a>
-    <a href="/contacto" class="nav-link"><i class="fa-solid fa-envelope"></i> Contacto</a>
+    <a href="/" class="nav-link"><span class="fa-solid fa-house"></span> Inicio</a>
+    <a href="/catalogo" class="nav-link"><span class="fa-solid fa-grid-2"></span> Catálogo</a>
+    <a href="/blog" class="nav-link"><span class="fa-solid fa-newspaper"></span> Blog</a>
+    <a href="/laboratorio" class="nav-link"><span class="fa-solid fa-flask"></span> Laboratorio</a>
+    <a href="/contacto" class="nav-link"><span class="fa-solid fa-envelope"></span> Contacto</a>
   </div>
   <div style="display:flex;align-items:center;gap:.6rem">
     <button class="nav-cart" id="btnCarrito">
-      <i class="fa-solid fa-cart-shopping"></i>
+      <span class="fa-solid fa-cart-shopping"></span>
       <span class="badge">0</span>
     </button>
     <button class="menu-toggle" id="menuToggle">
-      <i class="fa-solid fa-bars"></i>
+      <span class="fa-solid fa-bars"></span>
     </button>
   </div>
 </nav>
 
-<!-- CONTENIDO DE LA PÁGINA -->
+<!-- Aqui estara todo el contenido de la pagina -->
 <slot />
 
 <!-- FOOTER -->
 <footer class="footer">
   <div class="footer-grid">
     <div class="footer-brand">
-      <h3><i class="fa-solid fa-gem"></i> <span>RubyTech</span></h3>
+      <h3><span class="fa-solid fa-gem"></span> <span>RubyTech</span></h3>
       <p>Tu tienda de confianza en electrónica premium. Los mejores productos al mejor precio con garantía y envío rápido.</p>
       <div class="footer-socials">
-        <a href="#"><i class="fa-brands fa-facebook-f"></i></a>
-        <a href="#"><i class="fa-brands fa-twitter"></i></a>
-        <a href="#"><i class="fa-brands fa-instagram"></i></a>
-        <a href="#"><i class="fa-brands fa-youtube"></i></a>
-        <a href="#"><i class="fa-brands fa-tiktok"></i></a>
+        <a href="#"><span class="fa-brands fa-facebook-f"></span></a>
+        <a href="#"><span class="fa-brands fa-twitter"></span></a>
+        <a href="#"><span class="fa-brands fa-instagram"></span></a>
+        <a href="#"><span class="fa-brands fa-youtube"></span></a>
+        <a href="#"><span class="fa-brands fa-tiktok"></span></a>
       </div>
     </div>
     <div class="footer-col">
@@ -80,18 +93,18 @@ const { title = 'RubyTech' } = Astro.props;
     </div>
   </div>
   <div class="footer-bottom">
-    <p>&copy; 2024 RubyTech. Todos los derechos reservados. Diseñado con <i class="fa-solid fa-heart" style="color:var(--red)"></i></p>
+    <p>&copy; 2024 RubyTech. Todos los derechos reservados. Diseñado con <span class="fa-solid fa-heart" style="color:var(--red)"></span></p>
   </div>
 </footer>
 
 <script>
-  // Navbar scroll effect
+  // position fixed del header
   window.addEventListener('scroll', () => {
     const nav = document.getElementById('navbar');
     nav?.classList.toggle('scrolled', window.scrollY > 50);
   });
 
-  // Mobile menu toggle
+  // Mobile menu toggle // "?"" si el elemento existe, continuará y si no existe no hará nada
   document.getElementById('menuToggle')?.addEventListener('click', () => {
     document.getElementById('navLinks')?.classList.toggle('open');
   });
@@ -99,7 +112,7 @@ const { title = 'RubyTech' } = Astro.props;
   // Marcar enlace activo
   const links = document.querySelectorAll('.nav-link');
   links.forEach(link => {
-    if (link.getAttribute('href') === window.location.pathname) {
+    if (link.getAttribute('href') === window.location.pathname) { //compara cada hrf de cada enlace con la pagina en la que me encuentro "window.location.pathname", si me encuentro en /catalogo, compara cada <a> con mi pagina actual
       link.classList.add('active');
     }
   });
@@ -121,9 +134,9 @@ const { title = 'RubyTech' } = Astro.props;
 
   <!-- VACÍO -->
   <div id="carritoVacio" class="hidden flex-1 flex-col items-center justify-center gap-4 text-center p-8">
-    <i class="fa-solid fa-cart-shopping text-5xl" style="color:var(--text3)"></i>
+    <span class="fa-solid fa-cart-shopping text-5xl" style="color:var(--text3)"></span>
     <p style="color:var(--text3)">Tu carrito está vacío</p>
-    <a href="/catalogo" class="btn btn-primary" onclick="cerrarCarrito()"><i class="fa-solid fa-bag-shopping"></i> Ver Catálogo</a>
+    <a href="/catalogo" class="btn btn-primary" onclick="cerrarCarrito()"><span class="fa-solid fa-bag-shopping"></span> Ver Catálogo</a>
   </div>
 
   <!-- FOOTER -->
@@ -138,58 +151,65 @@ const { title = 'RubyTech' } = Astro.props;
       <span>Total</span>
       <span id="carritoTotal" style="background:linear-gradient(135deg,var(--primary),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent">0€</span>
     </div>
-    <button class="btn btn-primary w-full justify-center" onclick="alert('¡Gracias por tu compra!')">
-      <i class="fa-solid fa-credit-card"></i> Finalizar compra
+    <button class="btn btn-primary w-full justify-center">
+      <span class="fa-solid fa-credit-card"></span> Finalizar compra
     </button>
   </div>
 
 </div>
 
-<script is:inline>
+<script is:inline> //USAREMOS IS:INLINE PARA QUE ASTRO NO LE HAGA CASO A ESTE SCRIPT, POR LO CONTRARIO PODRÁ OPTIMIZARLO O INCLUSO MODIFICARLO
+
   function getCarrito() {
-    return JSON.parse(localStorage.getItem('carrito') || '[]');
+    return JSON.parse(localStorage.getItem('carrito') || '[]'); 
+    //guardará los datos aun recargando la pagina
+    //JSON.parse convierte ese texto en un array de JavaScript real con el que podemos trabajar
+    //busca un dato guardado con el nombre carrito si no encuentra nada, devuelve null y usara un array vacio
   }
 
   function saveCarrito(carrito) {
-    localStorage.setItem('carrito', JSON.stringify(carrito));
-    actualizarBadge();
+    localStorage.setItem('carrito', JSON.stringify(carrito)); //guarda un dato con ese nombre y convierte el array del carrito en texto
+    actualizarBadge(); //Actualiza la cantidad del carrito
   }
 
   function actualizarBadge() {
-    var carrito = getCarrito();
-    var total = carrito.reduce(function(t, i) { return t + i.cantidad; }, 0);
+    var carrito = getCarrito(); //obtiene el array del carrito guardado en local
+    var total = carrito.reduce(function(acumulador, p){ //con el metodo reduce calculamos el total
+      return acumulador + p.cantidad; 
+    }, 0);
     var badge = document.querySelector('.nav-cart .badge');
-    if (badge) badge.textContent = total.toString();
+    if (badge) badge.textContent = total.toString(); //convierte el numero en string para poder mostrarlo
   }
 
-  function getIcono(catSlug) {
+  function getIcono(catSlug) { //Esta funcion la usaremos para mostrar el icono del producto que estamos comprando 
     if (catSlug === 'moviles') return 'fa-mobile-screen-button';
     if (catSlug === 'portatiles') return 'fa-laptop';
     return 'fa-desktop';
   }
 
   function renderCarrito() {
-    var carrito = getCarrito();
-    var itemsEl = document.getElementById('carritoItems');
-    var vacioEl = document.getElementById('carritoVacio');
-    var footerEl = document.getElementById('carritoFooter');
+    var carrito = getCarrito(); //obtiene el array del carrito guardado en local
+    var itemsCarrito = document.getElementById('carritoItems');
+    var carritoVacio = document.getElementById('carritoVacio');
+    var footerCarrito = document.getElementById('carritoFooter');
 
-    if (!itemsEl) return;
+    if (!itemsCarrito) return; //si itemsCrrito no existe en html no hara nada
 
-    if (carrito.length === 0) {
-      itemsEl.style.display = 'none';
-      vacioEl.style.display = 'flex';
-      footerEl.style.display = 'none';
+    if (carrito.length === 0) { //si el carrito esta vacio, el contenedor del carrito = vacio, mensaje de vacio = visible, total = oculto
+      itemsCarrito.style.display = 'none';
+      carritoVacio.style.display = 'flex';
+      footerCarrito.style.display = 'none';
       return;
     }
 
-    vacioEl.style.display = 'none';
-    itemsEl.style.display = 'block';
-    footerEl.style.display = 'block';
+    //Lo contario a lo de arriba
+    carritoVacio.style.display = 'none';
+    itemsCarrito.style.display = 'block';
+    footerCarrito.style.display = 'block';
 
     var html = '';
-    for (var i = 0; i < carrito.length; i++) {
-      var item = carrito[i];
+    for (var i = 0; i < carrito.length; i++) {  //Recorremos cada producto del carrito y construimos el HTML de cada producto usando innerHTML
+      var item = carrito[i]; //guardamos el producto en una variable
       html += '<div class="rounded-xl mb-3 grid gap-3 items-center" style="background:var(--bg3);grid-template-columns:50px 1fr;padding:1rem 1.2rem">';
       html += '<div class="w-12 h-12 rounded-lg flex items-center justify-center text-xl" style="background:var(--bg4);color:rgba(255,255,255,.2)">';
       html += '<i class="fa-solid ' + getIcono(item.catSlug) + '"></i></div>';
@@ -207,41 +227,51 @@ const { title = 'RubyTech' } = Astro.props;
       html += '<button onclick="eliminarItem(\'' + item.id + '\')" class="cursor-pointer text-sm" style="background:none;border:none;color:var(--red)"><i class="fa-solid fa-trash"></i></button>';
       html += '</div></div></div></div>';
     }
-    itemsEl.innerHTML = html;
+    itemsCarrito.innerHTML = html;
 
-    var total = carrito.reduce(function(t, i) { return t + i.price * i.cantidad; }, 0);
-    document.getElementById('carritoSubtotal').textContent = total.toLocaleString('es-ES') + '€';
-    document.getElementById('carritoTotal').textContent = total.toLocaleString('es-ES') + '€';
+    var total = carrito.reduce(function(acum, p){ //calcular el total usando reduce
+      return acum + p.price * p.cantidad; 
+    }, 0);
+
+    document.getElementById('carritoSubtotal').textContent = total + ' €'; //muestra el precio antes de hacer la accion de comprar
+    document.getElementById('carritoTotal').textContent = total + ' €'; //muestra el precio una vez el usuario va a pagar de verdad
   }
 
-  function abrirCarrito() {
-    document.getElementById('carritoPanel').style.right = '0';
+  function abrirCarrito() { //Abre el carrito
+    document.getElementById('carritoPanel').style.right = '0'; //desliza el carrito hasta una posicion visible
     document.getElementById('carritoOverlay').classList.remove('hidden');
     document.getElementById('carritoOverlay').classList.add('block');
     renderCarrito();
   }
 
-  function cerrarCarrito() {
-    document.getElementById('carritoPanel').style.right = '-420px';
+  function cerrarCarrito() { //cierra el carrito
+    document.getElementById('carritoPanel').style.right = '-420px'; //lo pone invisible
     document.getElementById('carritoOverlay').classList.add('hidden');
     document.getElementById('carritoOverlay').classList.remove('block');
   }
 
-  window.cambiarCantidad = function(id, delta) {
-    var carrito = getCarrito();
-    for (var i = 0; i < carrito.length; i++) {
-      if (carrito[i].id === id) {
-        carrito[i].cantidad += delta;
-        if (carrito[i].cantidad <= 0) carrito.splice(i, 1);
+
+  //EN ESTA FUNCION Y EN LA DE ABAJO USARE WINDOW.() YA QUE AL LLAMARSE LAS FUNCIONES DESDE EL HTML Y USAR EL ONCLICK Y USO FUNCTION ASTRO PUEDE QUE NO ENCUENTRE LA FUNCION
+  window.cambiarCantidad = function(id, cambio) { //Esta funcion nos permite añadir 1 o restar 1 cantidad del mismo productoya dentro del carrito
+    var carrito = getCarrito(); //obtengo el carrito
+    for (var i = 0; i < carrito.length; i++) { //lo recorrremos
+      if (carrito[i].id === id) { //si encuentra el producto, le suma o le resta cantidad
+        carrito[i].cantidad += cambio;
+        if (carrito[i].cantidad <= 0) carrito.splice(i, 1); //si la cantidad de ese producto llega a 0, elimina el producto del carrito
         break;
       }
     }
-    saveCarrito(carrito);
+    saveCarrito(carrito); //guarda el carrito en local
     renderCarrito();
   }
 
-  window.eliminarItem = function(id) {
-    saveCarrito(getCarrito().filter(function(i) { return i.id !== id; }));
+  window.eliminarItem = function(id) { //poder eliminar el item que queramos del carrito
+    var carrito = getCarrito(); //volvemos a obtener el carrito
+    var carritoActualizado = carrito.filter(function(item) { //filtramos para capturar el id del producto que queremos eliminar
+        return item.id !== id;
+    });
+
+    saveCarrito(carritoActualizado); //guardamos
     renderCarrito();
   }
 

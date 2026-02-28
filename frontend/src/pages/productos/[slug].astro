@@ -2,27 +2,31 @@
 import MainLayout from '../../layouts/MainLayout.astro';
 import { getProducts, getProductBySlug } from '../../lib/api.js';
 
-export async function getStaticPaths() {
+export async function getStaticPaths() { //Genera pagina por cada producto
   const products = await getProducts();
   return products.map((p: any) => ({
     params: { slug: p.slug },
   }));
 }
 
-const { slug } = Astro.params;
-const p = await getProductBySlug(slug!);
+const { slug } = Astro.params; //obtenemos el slug de la URL actual
+const p = await getProductBySlug(slug!); //Busca el producto en strapi
+if (!p) return Astro.redirect('/catalogo'); //si no existe, redirige al catalogo
 
-if (!p) return Astro.redirect('/catalogo');
+let discount = 0;
 
-const discount = p.previousPrice
-  ? Math.round((1 - p.price / p.previousPrice) * 100)
-  : 0;
+if (p.previousPrice) {
+    // Calculamos el porcentaje de descuento
+    let diferencia = 1 - (p.price / p.previousPrice);
+    discount = Math.round(diferencia * 100);
+}
 
+//segun la categoria del producto devuelve el icono correspondiente
 const catSlug = p.category?.slug;
 const icon = catSlug === 'moviles' ? 'fa-mobile-screen-button' : catSlug === 'portatiles' ? 'fa-laptop' : 'fa-desktop';
 ---
 
-<MainLayout title={p.name}>
+<MainLayout title={p.name} metaTitle={p.seo?.metaTitle} metaDescription={p.seo?.metaDescription} keywords={p.seo?.keywords}> {/*CONECTAMOS CON EL SEO */}
   <section class="section" style="padding-top:100px">
 
     <a href="/catalogo" class="detail-back">
@@ -33,12 +37,12 @@ const icon = catSlug === 'moviles' ? 'fa-mobile-screen-button' : catSlug === 'po
 
       <!-- IMAGEN -->
       <div class="detail-image" style="background:var(--bg3)">
-        {p.badge && (
-          <span class={`detail-badge product-badge ${p.badge}`}>
+        {p.badge && ( //la clase cambia segun el badge (new, sale, popular)
+          <span class={`detail-badge product-badge ${p.badge}`}> 
             {p.badge === 'new' ? 'Nuevo' : p.badge === 'sale' ? 'Oferta' : 'Popular'}
           </span>
         )}
-        {p.image?.url
+        {p.image?.url //Si el producto teiene imagen la muestra sino muestra el icono segun sea su categoria
           ? <img src={`http://46.62.132.241:1337${p.image.url}`} alt={p.name} style="width:100%;height:100%;object-fit:contain;padding:2rem" />
           : <i class={`fa-solid ${icon}`}></i>
         }
@@ -46,22 +50,22 @@ const icon = catSlug === 'moviles' ? 'fa-mobile-screen-button' : catSlug === 'po
 
       <!-- INFO -->
       <div class="detail-info">
-        <div class="detail-brand">{p.brand} — {p.category?.name}</div>
+        <div class="detail-brand">{p.brand} — {p.category?.name}</div> <!-- Apple - Moviles -->
         <h1>{p.name}</h1>
 
         <div class="detail-price-box">
-          <span class="detail-price">{p.price.toLocaleString('es-ES')}€</span>
-          {p.previousPrice && (
-            <>
+          <span class="detail-price">{p.price.toLocaleString('es-ES')}€</span> <!-- Muestra siempre el precio actual -->
+          {p.previousPrice && ( // Si tiene precio anterior, lo muestra tambien tachado
+            <> <!--Fragmento de Astro que agrupa elementos sin añadir etiquetas HTML -->
               <span class="detail-old-price">{p.previousPrice.toLocaleString('es-ES')}€</span>
               <span class="detail-discount">-{discount}%</span>
             </>
           )}
         </div>
 
-        {p.description && (
+        {p.description && ( //Solo muestra la descripcion si existe
           <p class="detail-desc">
-            {p.description[0]?.children[0]?.text}
+            {p.description[0]?.children[0]?.text} <!--Obtiene el texto del primer bloque de descripcion de mi strapi -->
           </p>
         )}
 
@@ -93,14 +97,14 @@ const icon = catSlug === 'moviles' ? 'fa-mobile-screen-button' : catSlug === 'po
   </section>
 </MainLayout>
 
-<script define:vars={{ producto: { id: p.documentId, name: p.name, brand: p.brand, price: p.price, catSlug: p.category?.slug } }}>
+<script define:vars={{ producto: { id: p.documentId, name: p.name, brand: p.brand, price: p.price, catSlug: p.category?.slug } }}> //define:vars pasa variables Astro al script. Astro se ejecuta en el servidor y el script en el navegador, pues hace que sean "compatibles"
   function getCarrito() {
     return JSON.parse(localStorage.getItem('carrito') || '[]');
   }
 
   function saveCarrito(carrito) {
     localStorage.setItem('carrito', JSON.stringify(carrito));
-    const total = carrito.reduce((t, i) => t + i.cantidad, 0);
+    const total = carrito.reduce((t, i) =>t + i.cantidad, 0);
     const badge = document.querySelector('.nav-cart .badge');
     if (badge) badge.textContent = total.toString();
   }

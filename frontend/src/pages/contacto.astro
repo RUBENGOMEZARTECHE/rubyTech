@@ -84,16 +84,26 @@ import MainLayout from '../layouts/MainLayout.astro';
   </section>
 </MainLayout>
 
-<script>
-  document.getElementById('theForm')?.addEventListener('submit', (e) => {
-    e.preventDefault();
-    const form = document.getElementById('theForm') as HTMLElement;
-    form.style.display = 'none';
-    document.getElementById('formSuccess')!.style.display = 'block';
-    setTimeout(() => {
-      form.style.display = 'block';
-      (form as HTMLFormElement).reset();
-      document.getElementById('formSuccess')!.style.display = 'none';
+<script is:inline>
+  document.getElementById('theForm').addEventListener('submit', function(event) {
+    
+    // Evitamos que el formulario se envíe de forma tradicional
+    event.preventDefault();
+
+    // Obtenemos el formulario y el mensaje de éxito
+    var formulario = document.getElementById('theForm');
+    var mensajeExito = document.getElementById('formSuccess');
+
+    // Ocultamos el formulario y mostramos el mensaje de éxito
+    formulario.style.display = 'none';
+    mensajeExito.style.display = 'block';
+
+    // Después de 4 segundos volvemos a mostrar el formulario
+    setTimeout(function() {
+      formulario.style.display = 'block';
+      formulario.reset();
+      mensajeExito.style.display = 'none';
     }, 4000);
+
   });
 </script>

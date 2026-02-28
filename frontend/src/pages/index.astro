@@ -2,9 +2,9 @@
 import MainLayout from '../layouts/MainLayout.astro';
 import { getProducts, getCategories } from '../lib/api.js';
 
-const categories = await getCategories();
-const products = await getProducts();
-const featured = products.filter((p: any) => p.badge === 'hot' || p.rating >= 4.8).slice(0, 6);
+const categories = await getCategories(); //Obtiene todas las categorias y las guarda en categories
+const products = await getProducts(); // Obtiene todos los productos y los guarda en products
+const featured = products.filter((p: any) => p.badge === 'hot' || p.rating >= 4.8).slice(0, 6); //Filtra los productos que tengan badge hot O que tengan una valoración mayor o igual a 4.8, slice(0, 6) coge solo los 6 primeros resultados. El resultado se guarda en featured
 ---
 
 <MainLayout title="Inicio">
@@ -117,11 +117,35 @@ const featured = products.filter((p: any) => p.badge === 'hot' || p.rating >= 4.
 
 </MainLayout>
 
-<script>
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) entry.target.classList.add('visible');
-    });
-  }, { threshold: 0.1 });
-  document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+<script is:inline>
+
+  // Función que comprueba si los elementos son visibles en pantalla
+  function comprobarVisibilidad() {
+    
+    // Obtenemos todos los elementos con la clase fade-up
+    var elementos = document.querySelectorAll('.fade-up');
+    
+    // Recorremos cada elemento
+    for (var i = 0; i < elementos.length; i++) {
+      
+      // Obtenemos la posición del elemento en pantalla
+      var posicion = elementos[i].getBoundingClientRect();
+      
+      // Si el elemento está visible en pantalla le añadimos la clase visible
+      if (posicion.top < window.innerHeight) {
+        elementos[i].classList.add('visible');
+      }
+    }
+  }
+
+  // Comprobamos al cargar la página
+  document.addEventListener('DOMContentLoaded', function() {
+    comprobarVisibilidad();
+  });
+
+  // Comprobamos cada vez que el usuario hace scroll
+  window.addEventListener('scroll', function() {
+    comprobarVisibilidad();
+  });
+
 </script>

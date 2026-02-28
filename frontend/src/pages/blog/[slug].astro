@@ -1,55 +1,73 @@
 ---
-import MainLayout from '../../layouts/MainLayout.astro';
-import { getBlogPosts, getBlogPostBySlug } from '../../lib/api.js';
+import MainLayout from '../../layouts/MainLayout.astro'; //importamos main
+import { getBlogPosts, getBlogPostBySlug } from '../../lib/api.js'; //importamos solo esas dos funciones de la api,js
 
-export async function getStaticPaths() {
+export async function getStaticPaths() { //aqui le decimos a astro que paginas tiene que generar
   const posts = await getBlogPosts();
-  return posts.map((p: any) => ({
+  return posts.map((p: any) => ({ //por cada post genera una pagina con su slug - si tienes 6 post genera 6 paginas
     params: { slug: p.slug },
   }));
 }
 
-const { slug } = Astro.params;
-const post = await getBlogPostBySlug(slug!);
-
-if (!post) return Astro.redirect('/blog');
+const { slug } = Astro.params; //obtiene el slug de la url actual
+const post = await getBlogPostBySlug(slug!); //busca en strapi el post que tiene ese slug
+if (!post) return Astro.redirect('/blog'); //y si no existe redirige al usuario a la pagina de blog
 ---
 
-<MainLayout title={post.title}>
-  <section class="section" style="padding-top:100px">
+<MainLayout title={post.title}> <!-- TITULO DEL POST -->
+  <section class="pt-28 pb-16">
     <div class="blog-detail-content">
 
       <a href="/blog" class="detail-back">
-        <i class="fa-solid fa-arrow-left"></i> Volver al blog
+        <span class="fa-solid fa-arrow-left"></span> Volver al blog
       </a>
 
-      <h1>{post.title}</h1>
+      <h1>{post.title}</h1> <!-- CAPTURAMOS EL TITULO DEL POST -->
 
-      <div class="blog-detail-meta">
-        <span><i class="fa-regular fa-calendar"></i> {post.publishedDate}</span>
-        <span><i class="fa-regular fa-user"></i> {post.author}</span>
-        <span><i class="fa-regular fa-clock"></i> {post.readingTime} min de lectura</span>
-        <span><i class="fa-solid fa-tag"></i> {post.category}</span>
+      <div class="blog-detail-meta"> <!-- metadatos del post -->
+        <span><i class="fa-regular fa-calendar"></i> {post.publishedDate}</span> <!-- Fecha de publicacion del articulo -->
+        <span><i class="fa-regular fa-user"></i> {post.author}</span> <!-- Nombre del autor -->
+        <span><i class="fa-regular fa-clock"></i> {post.readingTime} min de lectura</span> <!-- Minutos aproximados de lectura -->
+        <span><i class="fa-solid fa-tag"></i> {post.category}</span> <!-- Categoría del articulo -->
       </div>
 
       <div class="blog-body">
-        {post.content?.map((block: any) => {
-          if (block.type === 'paragraph') {
-            return <p>{block.children?.map((c: any) => c.text).join('')}</p>;
+        {post.content?.map((articulo: any) => { //array con todo el contenido del articulo que viene de strapi. Recorre el contenido y lo guarda en una variable que se llama articulo
+
+          if (articulo.type === 'paragraph') { // si el bloque es un parrafo
+              let texto = articulo.children?.map((c: any) => c.text).join(''); //recoge todo el texto uniendolo todo y lo convierte en un parrafo
+              return <p>{texto}</p>; //mete todo el texto en una etiqueta p
           }
-          if (block.type === 'heading') {
-            const Tag = `h${block.level}` as any;
-            return <Tag>{block.children?.map((c: any) => c.text).join('')}</Tag>;
+
+          // Si el bloque es un título
+          if (articulo.type === 'heading') { 
+              let texto = articulo.children?.map((c: any) => c.text).join('');
+              if (articulo.level === 1){ //nivel = etiqueta HTML
+                return <h1>{texto}</h1>;
+              } 
+              if (articulo.level === 2){
+                return <h2>{texto}</h2>;
+              } 
+              if (articulo.level === 3){
+                return <h3>{texto}</h3>;
+              }
+              if (articulo.level === 4){
+                return <h4>{texto}</h4>;
+              } 
           }
-          if (block.type === 'list') {
-            return (
-              <ul>
-                {block.children?.map((item: any) => (
-                  <li>{item.children?.map((c: any) => c.text).join('')}</li>
-                ))}
-              </ul>
-            );
+
+          // Si el bloque es una lista, genera una ul, recorre cada elemento de la lista y lo mete en un elemento "li"
+          if (articulo.type === 'list') {
+              return (
+                  <ul>
+                      {articulo.children?.map((item: any) => {
+                          let texto = item.children?.map((c: any) => c.text).join('');
+                          return <li>{texto}</li>;
+                      })}
+                  </ul>
+              );
           }
+
         })}
       </div>
 
@@ -58,12 +76,36 @@ if (!post) return Astro.redirect('/blog');
 </MainLayout>
 
 <style>
-.blog-detail-content { max-width: 800px; margin: 0 auto; }
-.blog-detail-content h1 { font-size: 2rem; font-weight: 800; margin-bottom: 1rem; line-height: 1.3; }
-.blog-detail-meta { display: flex; gap: 1.5rem; margin-bottom: 2rem; padding-bottom: 1.5rem; border-bottom: 1px solid rgba(255,255,255,.06); color: var(--text3); font-size: .9rem; flex-wrap: wrap; }
-.blog-body { color: var(--text2); line-height: 1.8; font-size: 1rem; }
-.blog-body p { margin-bottom: 1.2rem; }
-.blog-body h2, .blog-body h3 { color: var(--text); margin: 2rem 0 1rem; font-size: 1.3rem; }
-.blog-body ul { margin: 1rem 0 1.5rem 1.5rem; }
-.blog-body ul li { margin-bottom: .5rem; }
+.blog-detail-content{ 
+  max-width: 800px; margin: 0 auto; 
+}
+
+.blog-detail-content h1 { 
+  font-size: 2rem; font-weight: 800; margin-bottom: 1rem; line-height: 1.3; 
+}
+
+.blog-detail-meta { 
+  display: flex; gap: 1.5rem; margin-bottom: 2rem; padding-bottom: 1.5rem; border-bottom: 1px solid rgba(255,255,255,.06); color: var(--text3); font-size: .9rem; flex-wrap: wrap; 
+}
+
+.blog-body { 
+  color: var(--text2); line-height: 1.8; font-size: 1rem; 
+}
+
+.blog-body p { 
+  margin-bottom: 1.2rem; 
+}
+
+.blog-body h2, .blog-body h3 { 
+  color: var(--text); margin: 2rem 0 1rem; font-size: 1.3rem; 
+}
+
+.blog-body ul { 
+  margin: 1rem 0 1.5rem 1.5rem; 
+}
+
+.blog-body ul li { 
+  margin-bottom: .5rem; 
+}
+
 </style>
