@@ -41,23 +41,23 @@ const badges = {
   none: products.filter((p: any) => !p.badge).length,
 };
 
-// Insights automáticos
-const catMasCara = statsPorCategoria.reduce((a, b) => a.media > b.media ? a : b);
-const catMasBarata = statsPorCategoria.reduce((a, b) => a.media < b.media ? a : b);
-const marcaTop = marcas[0];
-const totalOfertas = badges.sale + badges.hot;
+// Datos automáticos
+const catMasCara = statsPorCategoria.reduce((a, b) => a.media > b.media ? a : b); // Buscamos la categoría con el precio medio más alto comparando de dos en dos
+const catMasBarata = statsPorCategoria.reduce((a, b) => a.media < b.media ? a : b); // Buscamos la categoría con el precio medio más bajo comparando de dos en dos
+const marcaTop = marcas[0]; // La primera posición del array es la marca con más productos ya que está ordenado de mayor a menor
+const totalOfertas = badges.sale + badges.hot; // Sumamos los productos en oferta y los productos populares para obtener el total de productos con descuento o tendencia
 
-const insights = [
-  `${catMasCara.nombre} es la categoría con el precio medio más alto: ${catMasCara.media.toLocaleString('es-ES')}€`,
-  `${catMasBarata.nombre} ofrece la mejor accesibilidad con una media de ${catMasBarata.media.toLocaleString('es-ES')}€`,
-  `${marcaTop[0]} es la marca más representada con ${marcaTop[1]} productos en catálogo`,
-  `El ${Math.round((totalOfertas / totalProductos) * 100)}% del catálogo tiene descuento o es tendencia`,
-  `Rango de precios: desde ${precioMin.toLocaleString('es-ES')}€ hasta ${precioMax.toLocaleString('es-ES')}€`,
+const insights = [ // Array de frases generadas automáticamente con los datos reales del catálogo
+  `${catMasCara.nombre} es la categoría con el precio medio más alto: ${catMasCara.media.toLocaleString('es-ES')}€`,  // categoría con el precio medio más alto
+  `${catMasBarata.nombre} ofrece la mejor accesibilidad con una media de ${catMasBarata.media.toLocaleString('es-ES')}€`, // categoría con el precio medio más bajo
+  `${marcaTop[0]} es la marca más representada con ${marcaTop[1]} productos en catálogo`, //marca con más productos en el catálogo
+  `El ${Math.round((totalOfertas / totalProductos) * 100)}% del catálogo tiene descuento o es tendencia`,   //porcentaje de productos en oferta o tendencia
+  `Rango de precios: desde ${precioMin.toLocaleString('es-ES')}€ hasta ${precioMax.toLocaleString('es-ES')}€`, //rango de precios del catálogo completo
 ];
 
-const statsCategoriasJSON = JSON.stringify(statsPorCategoria.map(c => ({ nombre: c.nombre, media: c.media, max: c.max, min: c.min })));
+const statsCategoriasJSON = JSON.stringify(statsPorCategoria.map(c => ({ nombre: c.nombre, media: c.media, max: c.max, min: c.min }))); // Solo cogemos los datos que necesitamos: nombre, media, máximo y mínimo
 const marcasJSON = JSON.stringify(marcas);
-const badgesJSON = JSON.stringify(badges);
+const badgesJSON = JSON.stringify(badges); // Convertimos los badges a texto JSON para poder pasárselos al script del navegador
 ---
 
 <MainLayout title="Laboratorio Tecnológico">
@@ -168,49 +168,85 @@ const badgesJSON = JSON.stringify(badges);
   Chart.defaults.borderColor = gridColor;
 
   // Gráfico categorías
-  new Chart(document.getElementById('chartCategorias'), {
-    type: 'bar',
+  new Chart(document.getElementById('chartCategorias'), { // Creamos el gráfico de barras verticales para mostrar los precios por categoría
+    type: 'bar', //barras verticales
     data: {
-      labels: statsCategorias.map(c => c.nombre),
+      labels: statsCategorias.map(c => c.nombre), //etiquetas eje x: nombres de categorias
       datasets: [
-        { label: 'Media', data: statsCategorias.map(c => c.media), backgroundColor: 'rgba(108,92,231,.8)', borderRadius: 8 },
-        { label: 'Máximo', data: statsCategorias.map(c => c.max), backgroundColor: 'rgba(0,210,255,.6)', borderRadius: 8 },
-        { label: 'Mínimo', data: statsCategorias.map(c => c.min), backgroundColor: 'rgba(0,184,148,.6)', borderRadius: 8 },
+        { label: 'Media', data: statsCategorias.map(c => c.media), backgroundColor: 'rgba(108,92,231,.8)', borderRadius: 8 }, // Barra morada: precio medio de cada categoría
+        { label: 'Máximo', data: statsCategorias.map(c => c.max), backgroundColor: 'rgba(0,210,255,.6)', borderRadius: 8 }, // Barra azul: precio máximo de cada categoría
+        { label: 'Mínimo', data: statsCategorias.map(c => c.min), backgroundColor: 'rgba(0,184,148,.6)', borderRadius: 8 },   // Barra verde: precio mínimo de cada categoría
       ]
     },
-    options: { responsive: true, plugins: { legend: { position: 'bottom' } }, scales: { y: { grid: { color: gridColor } }, x: { grid: { color: gridColor } } } }
+    options: { 
+      responsive: true, // El gráfico se adapta al tamaño de la pantalla
+      plugins: { 
+        legend: { position: 'bottom' } // La leyenda se muestra en la parte inferior del gráfico
+      }, 
+      scales: { // Color de las líneas en el eje Y y X
+        y: { grid: { color: gridColor } }, 
+        x: { grid: { color: gridColor } } 
+      } }
   });
 
   // Gráfico marcas
-  new Chart(document.getElementById('chartMarcas'), {
-    type: 'bar',
+  new Chart(document.getElementById('chartMarcas'), { // Creamos el gráfico de barras para mostrar el ranking de marcas
+    type: 'bar', //barras
     data: {
-      labels: marcas.map(m => m[0]),
-      datasets: [{ label: 'Productos', data: marcas.map(m => m[1]), backgroundColor: 'rgba(108,92,231,.8)', borderRadius: 8 }]
+      labels: marcas.map(m => m[0]), //etiquetas del eje y : nombres de las marcas
+      datasets: [{ //barra morada: numero de productos de cada marca
+        label: 'Productos', 
+        data: marcas.map(m => m[1]), 
+        backgroundColor: 'rgba(108,92,231,.8)', 
+        borderRadius: 8 
+      }]
     },
-    options: { indexAxis: 'y', responsive: true, plugins: { legend: { display: false } }, scales: { x: { grid: { color: gridColor } }, y: { grid: { color: gridColor } } } }
+    options: { 
+      indexAxis: 'y', //barras horizontales hacia la derecha
+      responsive: true, 
+      plugins: { 
+        legend: { display: false } //ocultamos la leyenda
+      }, 
+      scales: { 
+        x: { grid: { color: gridColor } }, 
+        y: { grid: { color: gridColor } } 
+      } }
   });
 
   // Gráfico badges
-  new Chart(document.getElementById('chartBadges'), {
-    type: 'doughnut',
+  new Chart(document.getElementById('chartBadges'), { //grafico de donut para mostrar la distribucion de badges
+    type: 'doughnut', //tipo de donut con agujero en el centro
     data: {
-      labels: ['Nuevo', 'Oferta', 'Popular', 'Sin badge'],
-      datasets: [{ data: [badges.new, badges.sale, badges.hot, badges.none], backgroundColor: ['rgba(0,184,148,.8)', 'rgba(255,107,107,.8)', 'rgba(253,203,110,.8)', 'rgba(255,255,255,.1)'], borderWidth: 0 }]
+      labels: ['Nuevo', 'Oferta', 'Popular', 'Sin badge'],//cada badge
+      datasets: [{ 
+        data: [badges.new, badges.sale, badges.hot, badges.none], // Cantidad de productos de cada tipo de badge
+        backgroundColor: ['rgba(0,184,148,.8)', 'rgba(255,107,107,.8)', 'rgba(253,203,110,.8)', 'rgba(255,255,255,.1)'], // Color de cada sección: verde, rojo, amarillo y blanco transparente
+        borderWidth: 0  // Sin borde entre las secciones
+      }]
     },
-    options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
+    options: { 
+      responsive: true, 
+      plugins: { 
+        legend: { position: 'bottom' } // La leyenda se muestra en la parte inferior del gráfico
+      } 
+    }
   });
 
   // Gráfico rango
-  new Chart(document.getElementById('chartRango'), {
+  new Chart(document.getElementById('chartRango'), { //grafico de barras para mostrar el rango de precios
     type: 'bar',
     data: {
-      labels: statsCategorias.map(c => c.nombre),
+      labels: statsCategorias.map(c => c.nombre), //Eje x: nombre de las categorias
       datasets: [
-        { label: 'Mínimo', data: statsCategorias.map(c => c.min), backgroundColor: 'rgba(0,184,148,.7)', borderRadius: 8 },
-        { label: 'Máximo', data: statsCategorias.map(c => c.max), backgroundColor: 'rgba(255,107,107,.7)', borderRadius: 8 },
+        { label: 'Mínimo', data: statsCategorias.map(c => c.min), backgroundColor: 'rgba(0,184,148,.7)', borderRadius: 8 }, // Barra verde: precio mínimo de cada categoría
+        { label: 'Máximo', data: statsCategorias.map(c => c.max), backgroundColor: 'rgba(255,107,107,.7)', borderRadius: 8 }, // Barra roja: precio máximo de cada categoría
       ]
     },
-    options: { responsive: true, plugins: { legend: { position: 'bottom' } }, scales: { y: { grid: { color: gridColor } }, x: { grid: { color: gridColor } } } }
+    options: { 
+      responsive: true, 
+      plugins: { legend: { position: 'bottom' } }, 
+      scales: { y: { grid: { color: gridColor } }, 
+      x: { grid: { color: gridColor } } 
+    } }
   });
 </script>

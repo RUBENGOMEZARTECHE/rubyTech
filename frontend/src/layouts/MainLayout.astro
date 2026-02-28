@@ -33,10 +33,13 @@ const { //CONECTAMOS EL FRONTEND CON EL SEO
 
 <!-- NAVIGATION -->
 <nav class="nav" id="navbar">
-  <a href="/" class="nav-logo">
-    <span class="fa-solid fa-gem"></span>
-    <span>RubyTech</span>
-  </a>
+  <div style="display:flex;align-items:center;gap:.4rem">
+    <a href="/" class="nav-logo">
+      <span class="fa-solid fa-gem"></span>
+      <span>RubyTech</span>
+    </a>
+    <button id="oscuro-claro" style="background:none;border:none;cursor:pointer;font-size:1.3rem">🌙</button>
+  </div>
   <div class="nav-links" id="navLinks">
     <a href="/" class="nav-link"><span class="fa-solid fa-house"></span> Inicio</a>
     <a href="/catalogo" class="nav-link"><span class="fa-solid fa-grid-2"></span> Catálogo</a>
@@ -283,6 +286,28 @@ const { //CONECTAMOS EL FRONTEND CON EL SEO
   });
 </script>
 
+<script is:inline>
+  var btn = document.getElementById('oscuro-claro');
+
+  function oscuroClaro(dark) {
+    if (dark) {
+      document.documentElement.style = '';
+      btn.textContent = '🌙';
+    } else {
+      document.documentElement.style = 'invert(1) hue-rotate(180deg)'; //invierto todos los colores 180 grados en el circulo cromatico
+      btn.textContent = '☀️';
+    }
+    localStorage.setItem('dark', dark);
+  }
+
+  var dark = localStorage.getItem('dark') === 'false' ? false : true; // Si el usuario guardó 'false' en el navegador, dark será false, si no, será true (modo oscuro por defecto)
+  oscuroClaro(dark);
+
+  btn.onclick = function() { // Cuando el usuario hace clic en el botón, cambia el modo oscuro/claro al contrario del que está
+    dark = !dark;
+    oscuroClaro(dark);
+  }
+</script>
 
 </body>
 </html>
