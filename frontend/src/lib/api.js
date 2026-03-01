@@ -43,3 +43,9 @@ export async function getLabAnalyses() {
   const data = await res.json();
   return data.data;
 }
+
+export async function getFaqs() { // Función que obtiene las preguntas frecuentes de Strapi
+  const res = await fetch(`${STRAPI_URL}/api/faqs?populate=*`); // Hacemos la petición a la API de Strapi pidiendo todas las FAQs
+  const data = await res.json(); // Convertimos la respuesta en un objeto JavaScript
+  return data.data; // Devolvemos solo el array de FAQs
+}

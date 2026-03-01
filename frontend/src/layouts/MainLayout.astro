@@ -291,10 +291,10 @@ const { //CONECTAMOS EL FRONTEND CON EL SEO
 
   function oscuroClaro(dark) {
     if (dark) {
-      document.documentElement.style = '';
+      document.documentElement.style.filter = ''; //filter hace que afecte a todo el proyecto, no solo a un apartado o item
       btn.textContent = '🌙';
     } else {
-      document.documentElement.style = 'invert(1) hue-rotate(180deg)'; //invierto todos los colores 180 grados en el circulo cromatico
+      document.documentElement.style.filter = 'invert(1) hue-rotate(180deg)'; //invierto todos los colores 180 grados en el circulo cromatico
       btn.textContent = '☀️';
     }
     localStorage.setItem('dark', dark);

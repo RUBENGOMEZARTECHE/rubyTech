@@ -1,10 +1,11 @@
 ---
 import MainLayout from '../layouts/MainLayout.astro';
-import { getProducts, getCategories } from '../lib/api.js';
+import { getProducts, getCategories, getFaqs } from '../lib/api.js';
 
 const categories = await getCategories(); //Obtiene todas las categorias y las guarda en categories
 const products = await getProducts(); // Obtiene todos los productos y los guarda en products
 const featured = products.filter((p: any) => p.badge === 'hot' || p.rating >= 4.8).slice(0, 6); //Filtra los productos que tengan badge hot O que tengan una valoración mayor o igual a 4.8, slice(0, 6) coge solo los 6 primeros resultados. El resultado se guarda en featured
+const faqs = await getFaqs(); // Obtenemos las preguntas frecuentes de Strapi
 ---
 
 <MainLayout title="Inicio">
@@ -115,7 +116,49 @@ const featured = products.filter((p: any) => p.badge === 'hot' || p.rating >= 4.
 
   </section>
 
+  <!-- FAQS -->
+  
+  <section style="max-width:56rem;margin:0 auto;padding:4rem 1.5rem 5rem"> <!-- Sección con ancho máximo centrada -->
+  <div class="text-center" style="margin-bottom:3rem"> <!-- Cabecera centrada con margen inferior -->
+    <h2 class="text-4xl font-black" style="margin-bottom:1rem">Preguntas <span class="gradient">frecuentes</span></h2> <!-- Título principal -->
+    <p style="color:var(--text2)">Todo lo que necesitas saber antes de comprar</p> <!-- Subtítulo -->
+  </div>
+
+  <div id="faqList"> <!-- Contenedor de todas las preguntas -->
+    {faqs.map((faq: any) => ( // Recorremos el array de FAQs que viene de Strapi
+      <div class="faq-item rounded-2xl overflow-hidden" style="background:var(--bg2);border:1px solid rgba(255,255,255,.05);margin-bottom:1rem"> {/*Tarjeta de cada pregunta */}
+        <button class="faq-btn w-full flex justify-between items-center text-left cursor-pointer" style="background:none;border:none;color:var(--text);padding:1.2rem 1.5rem"> {/*Botón clickable con la pregunta */}
+          <span class="font-semibold">{faq.question}</span> {/*Texto de la pregunta */}
+          <i class="fa-solid fa-chevron-down faq-icon" style="transition:.3s;color:var(--accent)"></i> {/*Flecha que rota al abrir */}
+        </button>
+        <div class="faq-answer" style="display:none;padding:0 1.5rem 1.5rem;color:var(--text2);line-height:1.7">  {/*Respuesta oculta por defecto */}
+          {faq.answer} {/*texto de la respuesta */}
+        </div>
+      </div>
+    ))}
+  </div>
+</section>
+
 </MainLayout>
+
+<script is:inline>
+  var btns = document.querySelectorAll('.faq-btn'); // Seleccionamos todos los botones de las preguntas
+
+  for (var i = 0; i < btns.length; i++) { // Recorremos cada botón
+    btns[i].addEventListener('click', function() { // Añadimos un evento click a cada botón
+      var answer = this.nextElementSibling; // El div de la respuesta que está justo después del botón
+      var icon = this.querySelector('.faq-icon'); // El icono de la flecha dentro del botón
+
+      if (answer.style.display === 'none') { // Si la respuesta está oculta la mostramos
+        answer.style.display = 'block'; // Mostramos la respuesta
+        icon.style.transform = 'rotate(180deg)'; // Giramos la flecha hacia arriba
+      } else { // Si la respuesta está visible la ocultamos
+        answer.style.display = 'none'; // Ocultamos la respuesta
+        icon.style.transform = 'rotate(0deg)'; // Volvemos la flecha a su posición original
+      }
+    });
+  }
+</script>
 
 <script is:inline>
 
